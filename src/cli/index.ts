@@ -6,7 +6,8 @@ import { acceptIntoBaseline, pruneBaseline, readBaseline, writeBaseline } from "
 import { CONFIG_FILENAMES, DEFAULT_CONFIG, findConfigFile, loadConfig } from "../core/config.js";
 import { diffFindings } from "../core/findings.js";
 import { runMatrix } from "../core/run.js";
-import { SourceError, type PageSource } from "../sources/index.js";
+import { isGateError } from "../core/errors.js";
+import { type PageSource } from "../sources/index.js";
 import { formatReport } from "../report/format.js";
 import { readLastRun, writeRunArtifact } from "../report/json.js";
 
@@ -116,12 +117,13 @@ program
       process.exit(result.verdict === "fail" ? 1 : 0);
     } catch (err) {
       await closeBrowser();
-      if (err instanceof SourceError) {
+      if (isGateError(err)) {
         console.error(`a11y-gate: ${err.message}\n  ${err.remedy}`);
         // Exit 2 distinguishes "could not check" from "checked and failed", so CI
         // and the Stop hook can treat an unreachable dev server as not-a-failure.
         process.exit(2);
       }
+      // Anything left really is our bug, and a stack is the right response.
       console.error(`a11y-gate: ${err instanceof Error ? err.stack : String(err)}`);
       process.exit(2);
     }
@@ -323,7 +325,8 @@ function fail(message: string): void {
 
 program.parseAsync(process.argv).catch(async (err) => {
   await closeBrowser();
-  console.error(err instanceof Error ? err.stack : String(err));
+  if (isGateError(err)) console.error(`a11y-gate: ${err.message}\n  ${err.remedy}`);
+  else console.error(err instanceof Error ? err.stack : String(err));
   process.exit(2);
 });
 

@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    # The gate renders real pages, so CI must prove it works on Linux and not
+    # only on the maintainer's machine.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["20", "22"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      # `npm ci` runs `prepare`, which builds dist/.
+      - run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - run: npm run typecheck
+
+      - run: npm test
+
+      - name: Verify the CLI runs and reports a known-bad fixture
+        run: |
+          node dist/cli/index.js check fixtures/broken/focus.html && exit 1 || \
+            test $? -eq 1 && echo "CLI exited 1 on a failing page, as expected"
+
+      - name: Verify the clean fixture reports nothing
+        run: node dist/cli/index.js check fixtures/clean/kitchen-sink.html

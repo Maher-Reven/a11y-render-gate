@@ -71,11 +71,30 @@ generated UI because every CSS reset kills the default outline.
 
 ## Install
 
+Not on npm yet, so install from source. `npm install` builds it for you.
+
 ```bash
-npm install -D a11y-gate
-npx playwright install chromium
-npx a11y-gate init
+git clone https://github.com/Maher-Reven/a11y-gate.git
+cd a11y-gate
+npm install                        # installs deps and builds dist/
+npx playwright install chromium    # ~150MB, one time
+node dist/cli/index.js --help
 ```
+
+Check everything is wired up:
+
+```bash
+node dist/cli/index.js doctor
+```
+
+To use it inside another project, link it:
+
+```bash
+npm link                    # from the a11y-gate directory
+cd ~/your-project && a11y-gate init
+```
+
+Requires **Node 20+**. Chromium is the only browser used.
 
 ### As a Claude Code plugin
 
@@ -84,6 +103,9 @@ Bundles the MCP server, the blocking Stop hook, and the skill in one unit:
 ```bash
 claude --plugin-dir /path/to/a11y-gate
 ```
+
+The plugin runs `dist/`, so it needs a build first — `npm install` in the
+a11y-gate directory is enough.
 
 ---
 

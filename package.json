@@ -4,7 +4,9 @@
   "description": "An accessibility gate inside the agent loop. Renders the UI an agent just wrote and reports contrast, focus visibility, hit targets and label wiring as computed facts with fix-shaped payloads.",
   "license": "MIT",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "bin": {
     "a11y-gate": "./dist/cli/index.js",
     "a11y-gate-mcp": "./dist/mcp/server.js",
@@ -12,17 +14,40 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
-  "files": ["dist", "skills", "hooks", ".claude-plugin", ".mcp.json", "README.md", "LICENSE"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "skills",
+    "hooks",
+    ".claude-plugin",
+    ".mcp.json",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "prepare": "npm run build"
   },
-  "keywords": ["accessibility", "a11y", "wcag", "mcp", "claude-code", "agent", "contrast", "playwright"],
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "wcag",
+    "mcp",
+    "claude-code",
+    "agent",
+    "contrast",
+    "playwright"
+  ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
     "axe-core": "^4.13.0",
@@ -37,5 +62,13 @@
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Maher-Reven/a11y-gate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Maher-Reven/a11y-gate/issues"
+  },
+  "homepage": "https://github.com/Maher-Reven/a11y-gate#readme"
 }

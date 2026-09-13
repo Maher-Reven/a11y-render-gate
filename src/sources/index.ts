@@ -1,5 +1,6 @@
 import type { Session } from "../core/browser.js";
 import { prepareSession } from "../core/browser.js";
+import { GateError } from "../core/errors.js";
 
 /** A step the gate performs after load to reach state that only exists after interaction. */
 export type Action =
@@ -55,13 +56,9 @@ export interface LoadOptions {
   storybookUrl?: string;
 }
 
-export class SourceError extends Error {
-  constructor(
-    message: string,
-    /** What the caller should do about it — surfaced verbatim to the agent. */
-    readonly remedy: string,
-  ) {
-    super(message);
+export class SourceError extends GateError {
+  constructor(message: string, remedy: string) {
+    super(message, remedy);
     this.name = "SourceError";
   }
 }

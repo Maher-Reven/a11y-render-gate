@@ -1,4 +1,5 @@
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
+import { asBrowserError } from "./errors.js";
 import type { Theme, Viewport } from "./types.js";
 
 export const DEFAULT_VIEWPORT: Viewport = { name: "desktop", width: 1440, height: 900 };
@@ -14,7 +15,20 @@ let shared: Browser | null = null;
  */
 export async function getBrowser(): Promise<Browser> {
   if (shared && shared.isConnected()) return shared;
-  shared = await chromium.launch({
+  try {
+    shared = await launch();
+  } catch (err) {
+    // "Chromium isn't installed" is the most common first run, and deserves a
+    // one-line answer rather than a stack trace.
+    const friendly = asBrowserError(err);
+    if (friendly) throw friendly;
+    throw err;
+  }
+  return shared;
+}
+
+async function launch(): Promise<Browser> {
+  return chromium.launch({
     headless: true,
     args: [
       // Deterministic rendering: without this, font smoothing and GPU rasterisation
@@ -26,7 +40,6 @@ export async function getBrowser(): Promise<Browser> {
       "--hide-scrollbars",
     ],
   });
-  return shared;
 }
 
 export async function closeBrowser(): Promise<void> {

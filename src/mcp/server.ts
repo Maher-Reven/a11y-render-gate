@@ -11,7 +11,8 @@ import { runMatrix, runOnce } from "../core/run.js";
 import { annotatedScreenshot } from "../render/annotate.js";
 import { formatReport } from "../report/format.js";
 import { readLastRun, writeRunArtifact } from "../report/json.js";
-import { SourceError, type Action, type PageSource } from "../sources/index.js";
+import { isGateError } from "../core/errors.js";
+import { type Action, type PageSource } from "../sources/index.js";
 import type { Finding } from "../core/findings.js";
 
 const server = new McpServer({ name: "a11y-gate", version: "0.1.0" });
@@ -197,9 +198,7 @@ server.registerTool(
       }
       return { content };
     } catch (err) {
-      if (err instanceof SourceError) {
-        return errorResult(`${err.message}\n${err.remedy}`);
-      }
+      if (isGateError(err)) return errorResult(`${err.message}\n${err.remedy}`);
       return errorResult(err instanceof Error ? err.message : String(err));
     }
   },

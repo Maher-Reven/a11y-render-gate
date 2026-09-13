@@ -7,7 +7,8 @@ import { hasConfig, loadConfig, type GateConfig } from "../core/config.js";
 import { runOnce } from "../core/run.js";
 import { formatReport } from "../report/format.js";
 import { outPath, writeRunArtifact } from "../report/json.js";
-import { SourceError, type PageSource } from "../sources/index.js";
+import { isGateError } from "../core/errors.js";
+import { type PageSource } from "../sources/index.js";
 import type { Finding } from "../core/findings.js";
 
 interface StopHookInput {
@@ -84,8 +85,9 @@ async function main(): Promise<never> {
     }
   } catch (err) {
     await closeBrowser();
-    if (err instanceof SourceError) {
-      process.stderr.write(`a11y-gate: skipped — ${err.message}\n`);
+    if (isGateError(err)) {
+      // Cannot check is not the same as failed. Never block on it.
+      process.stderr.write(`a11y-gate: skipped — ${err.message}\n  ${err.remedy}\n`);
       return exit(0);
     }
     // An internal error in the gate is our bug, not the user's. Never block on it.
