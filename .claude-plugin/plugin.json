@@ -1,0 +1,12 @@
+{
+  "name": "a11y-gate",
+  "displayName": "Accessibility Gate",
+  "version": "0.1.0",
+  "description": "Renders the UI an agent just wrote and reports contrast, focus visibility, hit targets and label wiring as computed facts — then blocks the turn until they are fixed.",
+  "author": { "name": "a11y-gate contributors" },
+  "homepage": "https://github.com/a11y-gate/a11y-gate",
+  "license": "MIT",
+  "keywords": ["accessibility", "a11y", "wcag", "ui", "gate"],
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json"
+}
