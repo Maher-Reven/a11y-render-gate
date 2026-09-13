@@ -1,0 +1,56 @@
+<!doctype html>
+<!--
+  expect:
+    contrast  .muted-label      #8a8a8a on #ffffff, 3.45:1, needs 4.5
+    contrast  .ghost-link       #9bb7d4 on #ffffff, below 4.5
+    contrast  .faded            black at 30% opacity composited, below 4.5
+    contrast  .on-brand         #ffffff on #f0b429, below 4.5
+    contrast  .small-bold       17px bold still needs 4.5, not 3
+    advice    .disabled-hint    disabled, exempt from 1.4.3
+  pass:
+    .body-text      #1a1a1a on #ffffff
+    .large-heading  32px #767676 clears the 3:1 large-text bar
+    .inverse        #ffffff on #1a1a1a
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Contrast fixture</title>
+  <style>
+    body { background: #ffffff; font-family: system-ui, sans-serif; margin: 24px; }
+    .body-text { color: #1a1a1a; font-size: 16px; }
+    .large-heading { color: #767676; font-size: 32px; font-weight: 400; }
+    .muted-label { color: #8a8a8a; font-size: 14px; }
+    .ghost-link { color: #9bb7d4; font-size: 15px; }
+    .faded { color: #000000; opacity: 0.3; font-size: 16px; }
+    .brand-panel { background: #f0b429; padding: 12px; }
+    .on-brand { color: #ffffff; font-size: 16px; }
+    .small-bold { color: #949494; font-size: 17px; font-weight: 700; }
+    .inverse-panel { background: #1a1a1a; padding: 12px; }
+    .inverse { color: #ffffff; font-size: 16px; }
+    .disabled-hint { color: #b0b0b0; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <p class="body-text">Readable body copy that passes comfortably.</p>
+  <h1 class="large-heading">Large heading at the 3:1 bar</h1>
+
+  <p class="muted-label">Muted helper text nobody checks</p>
+  <p><a class="ghost-link" href="#">A washed-out link</a></p>
+  <p class="faded">Black text at thirty percent opacity</p>
+
+  <div class="brand-panel">
+    <p class="on-brand">White on brand yellow</p>
+  </div>
+
+  <p class="small-bold">Bold but not quite large enough</p>
+
+  <div class="inverse-panel">
+    <p class="inverse">Light on dark, passing</p>
+  </div>
+
+  <fieldset disabled>
+    <p class="disabled-hint">Disabled hint text, exempt from 1.4.3</p>
+  </fieldset>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<!--
+  expect:
+    label-wiring  label[for=emial]     serious   `for` points at an id that does not exist
+    label-wiring  #search-input        critical  no name at all
+    label-wiring  .icon-btn            critical  icon-only button, no aria-label
+    label-wiring  #bad-ref             serious   aria-labelledby points at a missing id
+    label-wiring  #phone               moderate  placeholder is the only name
+    label-wiring  img.no-alt           serious   no alt attribute
+    label-wiring  .mismatch            moderate  visible text not contained in accessible name
+  pass:
+    #email-ok     wired label
+    #wrapped      label wrapping the control
+    .named-btn    aria-label present
+    img.decor     alt="" is a valid decorative image
+-->
+<html lang="en">
+<head><meta charset="utf-8"><title>Label wiring fixture</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 24px; color: #1a1a1a; background: #fff; }
+  label, input, button { display: block; margin: 8px 0; font-size: 15px; }
+  input { padding: 8px; border: 1px solid #767676; }
+  button { padding: 10px 14px; min-width: 44px; min-height: 44px; }
+</style>
+</head>
+<body>
+  <!-- correct -->
+  <label for="email-ok">Email address</label>
+  <input id="email-ok" type="email">
+
+  <label>Full name <input id="wrapped" type="text"></label>
+
+  <button class="named-btn" type="button" aria-label="Close dialog">&times;</button>
+  <img class="decor" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" width="40" height="40">
+
+  <!-- broken -->
+  <label for="emial">Email (typo in for)</label>
+  <input id="email" type="email">
+
+  <input id="search-input" type="text">
+
+  <button class="icon-btn" type="button">&#9776;</button>
+
+  <input id="bad-ref" type="text" aria-labelledby="nonexistent-heading">
+
+  <input id="phone" type="tel" placeholder="Phone number">
+
+  <img class="no-alt" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" width="40" height="40">
+
+  <button class="mismatch" type="button" aria-label="Submit">Send message</button>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<!--
+  expect:
+    focus-visible  .no-outline     critical  outline:none with no replacement, nothing changes
+    focus-visible  .reset-all      critical  blanket *:focus{outline:none} reset
+    focus-visible  .faint-ring     serious   ring is clearly rendered but only ~1.6:1 against white
+    focus-visible  .ghost-ring     critical  #fdfdfd on #ffffff is below the perception floor,
+                                             so it is reported as no indicator at all
+  pass:
+    .default-ring   untouched, keeps the UA focus ring
+    .custom-ring    explicit high-contrast :focus-visible outline
+    .shadow-ring    box-shadow instead of outline, still clearly visible
+    .thin-ring      1px high-contrast ring: mostly antialiased edge pixels, so
+                    averaging them would understate its contrast and fail it
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Focus visibility fixture</title>
+  <style>
+    body { background: #ffffff; font-family: system-ui, sans-serif; margin: 24px; }
+    button, a { font-size: 15px; margin: 12px 0; display: block; width: 220px; }
+    button { padding: 10px 16px; border: 1px solid #767676; background: #ffffff; color: #1a1a1a; }
+
+    /* The single most common defect in generated UI: the ring is removed and
+       nothing replaces it. */
+    .no-outline:focus { outline: none; }
+
+    /* The same thing via a blanket reset, which is how it usually arrives. */
+    .reset-all:focus, .reset-all:focus-visible { outline: none; box-shadow: none; }
+
+    /* Rendered plainly, but far too low-contrast to serve as an indicator. */
+    .faint-ring:focus-visible { outline: 2px solid #d0d0d0; outline-offset: 0; }
+
+    /* Below the pixel-difference noise floor: this ring does not exist on screen,
+       and is reported as an absent indicator rather than a weak one. */
+    .ghost-ring:focus-visible { outline: 2px solid #fdfdfd; outline-offset: 0; }
+
+    /* Correct. */
+    .custom-ring:focus-visible { outline: 3px solid #1a5fd0; outline-offset: 2px; }
+    .shadow-ring:focus-visible { outline: none; box-shadow: 0 0 0 3px #1a5fd0; }
+    /* A thin ring is dominated by its antialiased edges. Measuring the indicator
+       by the mean of changed pixels reports this as low-contrast; measuring its
+       core reports it correctly. Guards the example.com false positive. */
+    .thin-ring:focus-visible { outline: 1px solid #1a5fd0; outline-offset: 0; }
+  </style>
+</head>
+<body>
+  <h1>Focus indicators</h1>
+
+  <button class="no-outline" type="button">Outline removed</button>
+  <button class="reset-all" type="button">Reset removed it</button>
+  <button class="faint-ring" type="button">Low-contrast ring</button>
+  <button class="ghost-ring" type="button">Imperceptible ring</button>
+
+  <button class="default-ring" type="button">Browser default</button>
+  <button class="custom-ring" type="button">Custom ring</button>
+  <button class="shadow-ring" type="button">Box shadow ring</button>
+  <button class="thin-ring" type="button">Thin high-contrast ring</button>
+</body>
+</html>

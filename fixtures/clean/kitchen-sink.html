@@ -1,0 +1,152 @@
+<!doctype html>
+<!--
+  expect: NOTHING.
+
+  Every probe must return zero findings here. This is the false-positive guard,
+  and it matters more than recall: a gate that cries wolf on correct code gets
+  switched off within a day, and then it catches nothing at all.
+
+  Deliberately includes the shapes most likely to trip a naive checker:
+    - a box-shadow focus ring rather than an outline
+    - light text on a dark panel
+    - an inline link inside prose, under 24px tall
+    - a UA-sized native checkbox
+    - a label wrapping its control rather than using `for`
+    - an icon-only button named by aria-label
+    - a decorative image with alt=""
+    - a disabled control with intentionally low-contrast text
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Accessible kitchen sink</title>
+  <style>
+    :root {
+      --fg: #1a1a1a;
+      --bg: #ffffff;
+      --muted: #595959;      /* 7.0:1 on white */
+      --accent: #0b4fb8;     /* 7.5:1 on white */
+      --ring: #0b4fb8;
+      --panel-bg: #14243d;
+      --panel-fg: #f2f6fc;
+    }
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 24px;
+      color: var(--fg);
+      background: var(--bg);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    h1 { font-size: 28px; }
+    p { max-width: 60ch; }
+    .muted { color: var(--muted); font-size: 14px; }
+
+    a { color: var(--accent); }
+
+    button {
+      font-size: 15px;
+      min-height: 44px;
+      min-width: 44px;
+      padding: 10px 18px;
+      border: 1px solid var(--accent);
+      background: var(--bg);
+      color: var(--accent);
+      margin: 8px 8px 8px 0;
+    }
+    button[disabled] {
+      border-color: #c9c9c9;
+      color: #a6a6a6;          /* exempt from 1.4.3, and reported as advice only */
+    }
+
+    /* A box-shadow ring is a perfectly valid indicator; a checker that only
+       inspects `outline` would report a false positive here. */
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    [role="button"]:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    label { display: block; margin: 12px 0 4px; }
+    input, select {
+      font-size: 15px;
+      padding: 10px;
+      min-height: 44px;
+      border: 1px solid #595959;
+      background: var(--bg);
+      color: var(--fg);
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      color: var(--panel-fg);
+      padding: 16px;
+      margin: 24px 0;
+      max-width: 60ch;
+    }
+    .panel a { color: #9dc4ff; }   /* 8.0:1 on the dark panel */
+    /* The default ring is far too dark to show up against the panel, so the
+       panel gets its own. The gate caught this when it was missing. */
+    .panel a:focus-visible { box-shadow: 0 0 0 3px #9dc4ff; }
+
+    .toolbar { display: flex; gap: 12px; }
+    [role="button"] {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>An accessible page</h1>
+
+  <p>
+    Body copy at a comfortable size, containing
+    <a href="#somewhere">an inline link</a> that sits inside the line box and is
+    therefore exempt from the target-size minimum.
+  </p>
+
+  <p class="muted">Secondary text that still clears 4.5:1.</p>
+
+  <div class="panel">
+    <p>Light text on a dark panel, which must resolve through the ancestor background.</p>
+    <p><a href="#more">A link on the dark panel</a></p>
+  </div>
+
+  <div class="toolbar">
+    <button type="button">Save</button>
+    <button type="button" aria-label="Delete item">&#128465;</button>
+    <div role="button" tabindex="0" aria-label="Duplicate item">&#43;</div>
+    <button type="button" disabled>Unavailable</button>
+  </div>
+
+  <form>
+    <label for="email">Email address</label>
+    <input id="email" type="email" placeholder="you@example.com">
+
+    <label>
+      Country
+      <select>
+        <option>Netherlands</option>
+        <option>Jordan</option>
+      </select>
+    </label>
+
+    <label><input type="checkbox"> Remember me</label>
+  </form>
+
+  <img
+    src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+    alt=""
+    width="48"
+    height="48">
+</body>
+</html>

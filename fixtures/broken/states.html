@@ -1,0 +1,25 @@
+<!doctype html>
+<!--
+  expect:
+    state-contrast  .fades-on-hover   passes at rest, fails on :hover
+    axe             html without lang, and a bad ARIA reference
+  pass:
+    .stays-readable  darkens on hover, still passing
+-->
+<html>
+<head><meta charset="utf-8"><title>State fixture</title>
+<style>
+  body { background:#fff; font-family: system-ui, sans-serif; margin:24px; color:#1a1a1a; }
+  a { display:block; margin:10px 0; font-size:16px; min-height:44px; }
+  .fades-on-hover { color:#0b4fb8; }
+  .fades-on-hover:hover { color:#b8cce8; }
+  .stays-readable { color:#0b4fb8; }
+  .stays-readable:hover { color:#062d6b; }
+</style>
+</head>
+<body>
+  <a class="fades-on-hover" href="#">Fades out when you point at it</a>
+  <a class="stays-readable" href="#">Darkens when you point at it</a>
+  <div role="region" aria-labelledby="missing-heading">A region naming nothing</div>
+</body>
+</html>

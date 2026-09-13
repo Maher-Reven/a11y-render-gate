@@ -1,0 +1,39 @@
+<!doctype html>
+<!--
+  expect:
+    keyboard-reach  .div-button      critical  click handler, not tabbable
+    keyboard-reach  .card-click      critical  click handler on a card, not tabbable
+    keyboard-reach  .jump-ahead      moderate  positive tabindex
+  pass:
+    .real-button    a real <button>
+    .roled          role=button + tabindex=0
+    .link           a real <a href>
+-->
+<html lang="en">
+<head><meta charset="utf-8"><title>Keyboard reach fixture</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 24px; color: #1a1a1a; background: #fff; }
+  .div-button, .roled, .card-click {
+    display: inline-block; padding: 12px 18px; border: 1px solid #767676;
+    cursor: pointer; margin: 8px 0; background: #fff;
+  }
+  button, a { display: inline-block; margin: 8px 0; padding: 12px 18px; font-size: 15px; }
+  a { color: #0b4fb8; }
+</style>
+</head>
+<body>
+  <button class="real-button" type="button">A real button</button>
+  <div class="roled" role="button" tabindex="0">Roled and focusable</div>
+  <a class="link" href="#">A real link</a>
+
+  <div class="div-button">Click me (div with handler)</div>
+  <div class="card-click">A whole clickable card</div>
+
+  <button class="jump-ahead" type="button" tabindex="3">Positive tabindex</button>
+
+  <script>
+    document.querySelector('.div-button').addEventListener('click', () => {});
+    document.querySelector('.card-click').addEventListener('click', () => {});
+  </script>
+</body>
+</html>

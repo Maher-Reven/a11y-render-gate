@@ -1,0 +1,51 @@
+<!doctype html>
+<!--
+  expect:
+    target-size  .tiny-icon     16x16, packed next to siblings
+    target-size  .tiny-icon2    16x16, packed next to siblings
+    target-size  .cramped-a     20x20 with a neighbour inside its 24px circle
+    target-size  .cramped-b     20x20 with a neighbour inside its 24px circle
+  pass:
+    .big-btn      48x48
+    .thin-bar     only 12px tall, but nothing comes within 12px of its centre,
+                  so the spacing exception applies and the spec is satisfied
+    .isolated     16x16 but nothing within 24px of its centre (spacing exception)
+    .inline-link  a link inside a sentence (inline exception)
+    .checkbox     UA-sized native checkbox
+-->
+<html lang="en">
+<head><meta charset="utf-8"><title>Target size fixture</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 24px; color: #1a1a1a; background: #fff; }
+  .toolbar { display: flex; gap: 2px; margin-bottom: 40px; }
+  .tiny-icon, .tiny-icon2 { width: 16px; height: 16px; padding: 0; border: 1px solid #767676; background: #fff; }
+  .big-btn { width: 48px; height: 48px; border: 1px solid #767676; background: #fff; }
+  .thin-bar { display: block; width: 120px; height: 12px; border: 1px solid #767676; background: #fff; margin-bottom: 60px; }
+  .pair { display: flex; gap: 2px; margin-bottom: 60px; }
+  .cramped-a, .cramped-b { width: 20px; height: 20px; padding: 0; border: 1px solid #767676; background: #fff; }
+  .isolated { width: 16px; height: 16px; padding: 0; border: 1px solid #767676; background: #fff; margin: 80px 0; display: block; }
+  p { font-size: 16px; line-height: 1.6; max-width: 40ch; }
+  a { color: #0b4fb8; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <button class="tiny-icon" type="button" aria-label="Bold">B</button>
+    <button class="tiny-icon2" type="button" aria-label="Italic">I</button>
+    <button class="big-btn" type="button" aria-label="Save">S</button>
+  </div>
+
+  <button class="thin-bar" type="button" aria-label="Thin control"></button>
+
+  <div class="pair">
+    <button class="cramped-a" type="button" aria-label="Cramped one"></button>
+    <button class="cramped-b" type="button" aria-label="Cramped two"></button>
+  </div>
+
+  <button class="isolated" type="button" aria-label="Isolated small control"></button>
+
+  <p>Some flowing prose with <a class="inline-link" href="#">an inline link</a> inside it, which the spec exempts.</p>
+
+  <label><input class="checkbox" type="checkbox"> Remember me</label>
+</body>
+</html>
