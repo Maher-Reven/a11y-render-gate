@@ -29,6 +29,7 @@ program
   .option("--export <name>", "named export to mount (defaults to the default export)")
   .option("--props <json>", "JSON props to mount the component with")
   .option("--wrapper <path>", "module exporting a provider wrapper")
+  .option("--within <selector>", "check only this subtree")
   .option("--storybook-url <url>", "Storybook root URL")
   .option("--only <rules>", "comma-separated rules to run")
   .option("--viewport <name>", "run only this configured viewport")
@@ -42,9 +43,9 @@ program
     if (opts.level) config.level = opts.level === "AAA" ? "AAA" : "AA";
     if (opts.storybookUrl) config.sources.storybookUrl = opts.storybookUrl;
 
-    let source: PageSource;
+    let sources: PageSource[];
     try {
-      source = resolveSource(target, opts, config.sources.baseUrl, config.sources.component);
+      sources = resolveSources(target, opts, config);
     } catch (err) {
       fail(err instanceof Error ? err.message : String(err));
       return;
@@ -62,12 +63,15 @@ program
     const previous = readLastRun(config);
 
     try {
+      let anyFailed = false;
+      for (const source of sources) {
       const result = await runMatrix(source, {
         config,
         only: opts.only?.split(",").map((r: string) => r.trim()),
         viewports,
         themes: themes as ("light" | "dark")[],
       });
+      if (result.verdict === "fail") anyFailed = true;
 
       const jsonPath = writeRunArtifact(config, {
         version: 1,
@@ -117,8 +121,11 @@ program
         );
       }
 
+      if (sources.length > 1) console.log("");
+      }
+
       await closeBrowser();
-      process.exit(result.verdict === "fail" ? 1 : 0);
+      process.exit(anyFailed ? 1 : 0);
     } catch (err) {
       await closeBrowser();
       if (isGateError(err)) {
@@ -274,6 +281,32 @@ program
   .action(async () => {
     await import("../mcp/server.js");
   });
+
+/**
+ * Everything this invocation should check.
+ *
+ * With no explicit target, a project that configured several routes gets all of
+ * them — matching what the Stop hook already does. Configuring three routes and
+ * silently checking one is the kind of gap that makes people distrust a report.
+ */
+function resolveSources(
+  target: string | undefined,
+  opts: Record<string, string | undefined>,
+  config: GateConfig,
+): PageSource[] {
+  const { baseUrl, routes } = config.sources;
+  const within = opts.within;
+  if (!target && !opts.url && !opts.html && !opts.story && !opts.component) {
+    if (baseUrl && routes?.length) {
+      return routes.map((route) => ({
+        kind: "url" as const,
+        url: new URL(route, baseUrl).toString(),
+        within,
+      }));
+    }
+  }
+  return [{ ...resolveSource(target, opts, baseUrl, config.sources.component), within }];
+}
 
 function resolveSource(
   target: string | undefined,

@@ -1,4 +1,5 @@
 import type { Page } from "playwright";
+import { GateError } from "./errors.js";
 import type { CollectResult } from "./types.js";
 
 export const IDX_ATTR = "data-a11y-gate-idx";
@@ -8,6 +9,13 @@ export interface CollectOptions {
   maxElements?: number;
   /** Selectors to skip entirely (third-party widgets, ad slots). */
   ignore?: string[];
+  /**
+   * Restrict the scan to one subtree, e.g. the component you just changed on an
+   * otherwise large page. Ancestors outside the scope are still walked for
+   * background compositing, because what a colour renders against does not stop
+   * mattering just because you narrowed the report.
+   */
+  within?: string;
 }
 
 /**
@@ -26,10 +34,10 @@ export async function collect(
   page: Page,
   options: CollectOptions = {},
 ): Promise<CollectResult> {
-  const { maxElements = 3000, ignore = [] } = options;
+  const { maxElements = 3000, ignore = [], within } = options;
 
-  return page.evaluate(
-    ({ maxElements, ignore, IDX_ATTR }) => {
+  const result = (await page.evaluate(
+    ({ maxElements, ignore, IDX_ATTR, within }) => {
       const SKIP_TAGS = new Set([
         "script", "style", "meta", "link", "head", "title", "noscript",
         "template", "br", "source", "track", "param", "base",
@@ -150,9 +158,11 @@ export async function collect(
       const snapshots: any[] = [];
       let skipped = 0;
 
-      const all = Array.from(document.body?.querySelectorAll("*") ?? []);
-      // Include body itself: it usually carries the page background.
-      if (document.body) all.unshift(document.body);
+      const scope = within ? document.querySelector(within) : document.body;
+      if (!scope) return { scopeMissing: true };
+      const all = Array.from(scope.querySelectorAll("*"));
+      // Include the scope root itself: it usually carries the background.
+      all.unshift(scope);
 
       for (const el of all) {
         if (snapshots.length >= maxElements) {
@@ -336,8 +346,16 @@ export async function collect(
         },
       };
     },
-    { maxElements, ignore, IDX_ATTR },
-  ) as Promise<CollectResult>;
+    { maxElements, ignore, IDX_ATTR, within },
+  )) as CollectResult | { scopeMissing: true };
+
+  if ('scopeMissing' in result) {
+    throw new GateError(
+      `Nothing on the page matches within="${within}".`,
+      'Check the selector, or drop it to check the whole page.',
+    );
+  }
+  return result;
 }
 
 /** Remove our marker attributes — matters when the page under test is a real app. */

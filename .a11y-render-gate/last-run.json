@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "timestamp": "2026-09-14T09:45:25.930Z",
+  "source": "inline HTML",
+  "verdict": "fail",
+  "counts": {
+    "critical": 0,
+    "serious": 1,
+    "moderate": 0,
+    "advice": 0
+  },
+  "durationMs": 257,
+  "findings": [
+    {
+      "id": "d87a0dfe7f6c",
+      "rule": "contrast",
+      "severity": "serious",
+      "wcag": [
+        "1.4.3 Contrast (Minimum) (AA)"
+      ],
+      "selector": "#keep > p",
+      "label": "p \"inside the scope\"",
+      "facts": {
+        "foreground": "#8a8a8a",
+        "background": "#ffffff",
+        "ratio": 3.45,
+        "required": 4.5,
+        "fontPx": 14,
+        "fontWeight": 400,
+        "largeText": false,
+        "apcaLc": 62.1,
+        "orBackground": "#212121"
+      },
+      "fix": {
+        "summary": "Set color to #747474 (4.67:1 against #ffffff), or keep the text and set background to #212121.",
+        "css": "color: #747474;"
+      },
+      "context": "desktop 1440x900, light"
+    }
+  ],
+  "suppressed": [],
+  "contexts": [
+    "desktop 1440x900, light"
+  ]
+}

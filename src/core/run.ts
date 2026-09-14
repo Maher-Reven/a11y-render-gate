@@ -70,7 +70,10 @@ export async function runOnce(
       rootDir: config.rootDir,
     });
 
-    const collected = await collect(session.page, { ignore: config.ignore });
+    const collected = await collect(session.page, {
+      ignore: config.ignore,
+      within: source.within,
+    });
     const findings: Finding[] = [];
 
     // --- Passive probes, all pure over the collected snapshots ---------------

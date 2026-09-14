@@ -102,6 +102,8 @@ a11y-render-gate check http://localhost:5173/checkout   # a running app
 a11y-render-gate check ./component.html                 # a standalone file
 a11y-render-gate check --story ui-button--secondary     # a Storybook story
 a11y-render-gate check --component src/ui/Button.tsx    # one component, in isolation
+a11y-render-gate check                                  # every route in your config
+a11y-render-gate check / --within '.checkout-form'      # just one subtree
 a11y-render-gate doctor                                 # what can it currently reach?
 ```
 
@@ -280,7 +282,7 @@ must produce **zero** findings.
 
 Working and covered by tests: the CLI, the MCP server, the blocking Stop hook,
 the Claude Code plugin, all seven rules, and all four sources — `url`, `html`,
-`storybook` and `component`. 68 tests pass, fixture-driven.
+`storybook` and `component`. 72 tests pass, fixture-driven.
 
 Not built yet:
 
