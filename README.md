@@ -285,7 +285,7 @@ must produce **zero** findings.
 
 Working and covered by tests: the CLI, the MCP server, the blocking Stop hook,
 the Claude Code plugin, all seven rules, and all four sources — `url`, `html`,
-`storybook` and `component`. 76 tests pass, fixture-driven.
+`storybook` and `component`. 72 tests pass, fixture-driven.
 
 Not built yet:
 
