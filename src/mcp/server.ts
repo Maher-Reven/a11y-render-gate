@@ -15,7 +15,7 @@ import { isGateError } from "../core/errors.js";
 import { type Action, type PageSource } from "../sources/index.js";
 import type { Finding } from "../core/findings.js";
 
-const server = new McpServer({ name: "a11y-render-gate", version: "0.1.0" });
+const server = new McpServer({ name: "a11y-render-gate", version: "0.2.0" });
 
 const actionSchema = z.union([
   z.object({ click: z.string() }),

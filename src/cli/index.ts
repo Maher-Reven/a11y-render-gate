@@ -16,7 +16,7 @@ const program = new Command();
 program
   .name("a11y-render-gate")
   .description("Render the UI and report accessibility defects as computed facts.")
-  .version("0.1.0");
+  .version("0.2.0");
 
 program
   .command("check", { isDefault: true })

@@ -281,16 +281,26 @@ must produce **zero** findings.
 
 ---
 
-## Status — v0.1.0
+## Status — v0.2.0
 
 Working and covered by tests: the CLI, the MCP server, the blocking Stop hook,
 the Claude Code plugin, all seven rules, and all four sources — `url`, `html`,
 `storybook` and `component`. 72 tests pass, fixture-driven.
 
+Validated against real pages, not only fixtures: a 3,000-element Wikipedia
+article and a production homepage. That exercise removed three false-positive
+classes that every hand-written fixture had missed — `cursor: pointer` alone is
+no longer treated as evidence of a control, the WCAG inline exception now
+measures against the containing block, and visually hidden skip links are no
+longer reported for contrast.
+
 Not built yet:
 
 - **Source mapping** — findings carry the offending element's classes, but not a
   `file:line`.
+- **Windows** — CI covers Linux; developed on macOS.
+- **Sites behind bot protection** may still refuse to load even with a custom
+  user-agent, if they use a JavaScript challenge.
 
 Interfaces may change before 1.0.
 
