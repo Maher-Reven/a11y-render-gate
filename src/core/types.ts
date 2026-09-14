@@ -85,6 +85,17 @@ export interface ElementSnapshot {
   attrs: SnapshotAttrs;
   /** Natively interactive tag, interactive ARIA role, or a click affordance. */
   interactive: boolean;
+  /**
+   * A click handler attached by a framework, read from its own internal props.
+   *
+   * React 17+ attaches listeners to the root container rather than the element,
+   * so CDP's getEventListeners reports nothing for <div onClick> — the exact
+   * pattern this tool exists to catch. Reading the framework's props directly is
+   * the only way to see it.
+   */
+  frameworkClickHandler: boolean;
+  /** An ancestor is itself focusable or natively interactive. */
+  hasInteractiveAncestor: boolean;
   /** Reachable by Tab right now. */
   tabbable: boolean;
   /** Rendered, non-zero-size, not visibility:hidden, not aria-hidden. */

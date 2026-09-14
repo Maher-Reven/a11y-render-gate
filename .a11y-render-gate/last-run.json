@@ -1,39 +1,465 @@
 {
   "version": 1,
-  "timestamp": "2026-09-14T09:45:25.930Z",
-  "source": "inline HTML",
+  "timestamp": "2026-09-14T10:49:09.017Z",
+  "source": "https://en.wikipedia.org/wiki/Accessibility",
   "verdict": "fail",
   "counts": {
-    "critical": 0,
-    "serious": 1,
-    "moderate": 0,
+    "critical": 7,
+    "serious": 13,
+    "moderate": 2,
     "advice": 0
   },
-  "durationMs": 257,
+  "durationMs": 9279,
   "findings": [
     {
-      "id": "d87a0dfe7f6c",
+      "id": "c93511a0b1a3",
       "rule": "contrast",
-      "severity": "serious",
+      "severity": "critical",
       "wcag": [
         "1.4.3 Contrast (Minimum) (AA)"
       ],
-      "selector": "#keep > p",
-      "label": "p \"inside the scope\"",
+      "selector": "span.frb-submit-txt-continue",
+      "label": "span \"Continue\"",
       "facts": {
-        "foreground": "#8a8a8a",
+        "foreground": "#eeeeef",
         "background": "#ffffff",
-        "ratio": 3.45,
+        "ratio": 1.15,
         "required": 4.5,
-        "fontPx": 14,
-        "fontWeight": 400,
+        "fontPx": 16,
+        "fontWeight": 700,
         "largeText": false,
-        "apcaLc": 62.1,
-        "orBackground": "#212121"
+        "apcaLc": 7.4,
+        "orBackground": "#6a6a6a"
       },
       "fix": {
-        "summary": "Set color to #747474 (4.67:1 against #ffffff), or keep the text and set background to #212121.",
-        "css": "color: #747474;"
+        "summary": "Set color to #74777a (4.5:1 against #ffffff), or keep the text and set background to #6a6a6a.",
+        "css": "color: #74777a;"
+      },
+      "sourceHint": "class=\"frb-submit-txt-continue\"",
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "selector": "#input_amount_other",
+      "label": "input[name=\"amount\"]",
+      "sourceHint": "class=\"frb-radio\"",
+      "wcag": [
+        "2.4.7 Focus Visible (AA)"
+      ],
+      "id": "23b1134ed0a4",
+      "rule": "focus-visible",
+      "severity": "critical",
+      "facts": {
+        "changedPixels": 0,
+        "maxPixelDelta": 0,
+        "outlineStyle": "none",
+        "outlineWidth": 3,
+        "verdict": "nothing changes on screen when this element receives focus"
+      },
+      "fix": {
+        "summary": "outline is set to none with no replacement — add a :focus-visible ring (e.g. 2px solid #1a5fd0).",
+        "css": ":focus-visible {\n  outline: 2px solid #1a5fd0;\n  outline-offset: 2px;\n}"
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "929aff7f9cd9",
+      "rule": "label-wiring",
+      "severity": "critical",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "#mwATA",
+      "label": "a#mwATA",
+      "facts": {
+        "role": "link",
+        "computedName": "",
+        "verdict": "screen readers announce this control with no name",
+        "emptyNameSources": "aria-labelledby, aria-label, title"
+      },
+      "fix": {
+        "summary": "Icon-only control: add aria-label describing the action, not the icon.",
+        "html": "<a aria-label=\"Describe the action\">…</a>"
+      },
+      "sourceHint": "class=\"mw-file-description\"",
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "ceab3ab38ecb",
+      "rule": "label-wiring",
+      "severity": "critical",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "#mwAWc",
+      "label": "a#mwAWc",
+      "facts": {
+        "role": "link",
+        "computedName": "",
+        "verdict": "screen readers announce this control with no name",
+        "emptyNameSources": "aria-labelledby, aria-label, title"
+      },
+      "fix": {
+        "summary": "Icon-only control: add aria-label describing the action, not the icon.",
+        "html": "<a aria-label=\"Describe the action\">…</a>"
+      },
+      "sourceHint": "class=\"mw-file-description\"",
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "be640f5452fd",
+      "rule": "label-wiring",
+      "severity": "critical",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "#mwBIs",
+      "label": "a \"2\"",
+      "facts": {
+        "role": "link",
+        "computedName": "",
+        "verdict": "screen readers announce this control with no name",
+        "emptyNameSources": "aria-labelledby, aria-label, title"
+      },
+      "fix": {
+        "summary": "Give this control an accessible name via visible text, aria-label, or aria-labelledby."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "8089dd6f15e5",
+      "rule": "label-wiring",
+      "severity": "critical",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "#mwBKQ",
+      "label": "a \"2\"",
+      "facts": {
+        "role": "link",
+        "computedName": "",
+        "verdict": "screen readers announce this control with no name",
+        "emptyNameSources": "aria-labelledby, aria-label, title"
+      },
+      "fix": {
+        "summary": "Give this control an accessible name via visible text, aria-label, or aria-labelledby."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "eac6abafebd7",
+      "rule": "label-wiring",
+      "severity": "critical",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "#mwBS4",
+      "label": "a \"2\"",
+      "facts": {
+        "role": "link",
+        "computedName": "",
+        "verdict": "screen readers announce this control with no name",
+        "emptyNameSources": "aria-labelledby, aria-label, title"
+      },
+      "fix": {
+        "summary": "Give this control an accessible name via visible text, aria-label, or aria-labelledby."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "selector": "#frb-continue",
+      "label": "button \"Continue Donate one time Donate month…\"",
+      "sourceHint": "class=\"frb-submit\"",
+      "wcag": [
+        "1.4.11 Non-text Contrast (AA)"
+      ],
+      "id": "5cf6e156764b",
+      "rule": "focus-visible",
+      "severity": "serious",
+      "facts": {
+        "indicatorColor": "#98b1e5",
+        "adjacentColor": "#ffffff",
+        "indicatorContrast": 2.15,
+        "required": 3,
+        "changedPixels": 1368,
+        "verdict": "focus indicator is visible but too low-contrast against its surroundings"
+      },
+      "fix": {
+        "summary": "Use a focus ring colour of #7294db (3.01:1 against the adjacent surface).",
+        "css": ":focus-visible {\n  outline: 2px solid #7294db;\n  outline-offset: 2px;\n}"
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "selector": "#frb-form > div:nth-of-type(1) > button:nth-of-type(1)",
+      "label": "button [aria-label=\"Close\"]",
+      "sourceHint": "class=\"frb-icon-btn frb-close skin-invert\"",
+      "wcag": [
+        "1.4.11 Non-text Contrast (AA)"
+      ],
+      "id": "2cdfbdc89076",
+      "rule": "focus-visible",
+      "severity": "serious",
+      "facts": {
+        "indicatorColor": "#98b1e5",
+        "adjacentColor": "#ffffff",
+        "indicatorContrast": 2.15,
+        "required": 3,
+        "changedPixels": 184,
+        "verdict": "focus indicator is visible but too low-contrast against its surroundings"
+      },
+      "fix": {
+        "summary": "Use a focus ring colour of #7294db (3.01:1 against the adjacent surface).",
+        "css": ":focus-visible {\n  outline: 2px solid #7294db;\n  outline-offset: 2px;\n}"
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "91029bab9f3e",
+      "rule": "label-wiring",
+      "severity": "serious",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "#frb-main > div > div:nth-of-type(1) > div:nth-of-type(3) > svg",
+      "label": "svg \"Wikimedia Foundation\"",
+      "facts": {
+        "aria-labelledby": "frb-wmf-identity-logo-title",
+        "missingIds": "frb-wmf-identity-logo-title",
+        "verdict": "aria-labelledby references an id that does not exist"
+      },
+      "fix": {
+        "summary": "Remove or correct aria-labelledby=\"frb-wmf-identity-logo-title\" — frb-wmf-identity-logo-title is not in the document."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "a6c4b8fcd495",
+      "rule": "label-wiring",
+      "severity": "serious",
+      "wcag": [
+        "1.1.1 Non-text Content (A)"
+      ],
+      "selector": "#mwATE",
+      "label": "img#mwATE",
+      "facts": {
+        "computedName": "",
+        "verdict": "image has no alt attribute, so its filename is announced instead"
+      },
+      "fix": {
+        "summary": "Add alt text describing the image's purpose, or alt=\"\" if it is purely decorative.",
+        "html": "<img ... alt=\"describe the image, or empty if decorative\">"
+      },
+      "sourceHint": "class=\"mw-file-element\"",
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "67def402cc43",
+      "rule": "label-wiring",
+      "severity": "serious",
+      "wcag": [
+        "1.1.1 Non-text Content (A)"
+      ],
+      "selector": "#mwAWg",
+      "label": "img#mwAWg",
+      "facts": {
+        "computedName": "",
+        "verdict": "image has no alt attribute, so its filename is announced instead"
+      },
+      "fix": {
+        "summary": "Add alt text describing the image's purpose, or alt=\"\" if it is purely decorative.",
+        "html": "<img ... alt=\"describe the image, or empty if decorative\">"
+      },
+      "sourceHint": "class=\"mw-file-element\"",
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "9cbc2389cbb9",
+      "rule": "label-wiring",
+      "severity": "serious",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "div:nth-of-type(1) > fieldset:nth-of-type(3) > div > div:nth-of-type(2) > label > svg",
+      "label": "svg \"iDEAL\"",
+      "facts": {
+        "aria-labelledby": "frb-logo-ideal-title",
+        "missingIds": "frb-logo-ideal-title",
+        "verdict": "aria-labelledby references an id that does not exist"
+      },
+      "fix": {
+        "summary": "Remove or correct aria-labelledby=\"frb-logo-ideal-title\" — frb-logo-ideal-title is not in the document."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "8e393e86efe9",
+      "rule": "label-wiring",
+      "severity": "serious",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "div:nth-of-type(1) > fieldset:nth-of-type(3) > div > div:nth-of-type(3) > label > svg",
+      "label": "svg \"PayPal\"",
+      "facts": {
+        "aria-labelledby": "frb-logo-paypal-title",
+        "missingIds": "frb-logo-paypal-title",
+        "verdict": "aria-labelledby references an id that does not exist"
+      },
+      "fix": {
+        "summary": "Remove or correct aria-labelledby=\"frb-logo-paypal-title\" — frb-logo-paypal-title is not in the document."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "789afaa104f2",
+      "rule": "label-wiring",
+      "severity": "serious",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "div:nth-of-type(1) > fieldset:nth-of-type(3) > div > div:nth-of-type(4) > label > svg",
+      "label": "svg \"Apple Pay\"",
+      "facts": {
+        "aria-labelledby": "frb-logo-applepay-title",
+        "missingIds": "frb-logo-applepay-title",
+        "verdict": "aria-labelledby references an id that does not exist"
+      },
+      "fix": {
+        "summary": "Remove or correct aria-labelledby=\"frb-logo-applepay-title\" — frb-logo-applepay-title is not in the document."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "df53d2a876af",
+      "rule": "label-wiring",
+      "severity": "serious",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "div:nth-of-type(1) > fieldset:nth-of-type(3) > div > div:nth-of-type(5) > label > svg",
+      "label": "svg \"Google Pay\"",
+      "facts": {
+        "aria-labelledby": "frb-logo-google-title",
+        "missingIds": "frb-logo-google-title",
+        "verdict": "aria-labelledby references an id that does not exist"
+      },
+      "fix": {
+        "summary": "Remove or correct aria-labelledby=\"frb-logo-google-title\" — frb-logo-google-title is not in the document."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "7ae7f7a57482",
+      "rule": "label-wiring",
+      "severity": "serious",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "fieldset:nth-of-type(3) > div > div:nth-of-type(1) > label > span:nth-of-type(2) > svg:nth-of-type(1)",
+      "label": "svg \"Visa\"",
+      "facts": {
+        "aria-labelledby": "frb-cc-logo-visa-title",
+        "missingIds": "frb-cc-logo-visa-title",
+        "verdict": "aria-labelledby references an id that does not exist"
+      },
+      "fix": {
+        "summary": "Remove or correct aria-labelledby=\"frb-cc-logo-visa-title\" — frb-cc-logo-visa-title is not in the document."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "acd8702fa2cb",
+      "rule": "label-wiring",
+      "severity": "serious",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "fieldset:nth-of-type(3) > div > div:nth-of-type(1) > label > span:nth-of-type(2) > svg:nth-of-type(2)",
+      "label": "svg \"Mastercard\"",
+      "facts": {
+        "aria-labelledby": "frb-cc-logo-mastercard-title",
+        "missingIds": "frb-cc-logo-mastercard-title",
+        "verdict": "aria-labelledby references an id that does not exist"
+      },
+      "fix": {
+        "summary": "Remove or correct aria-labelledby=\"frb-cc-logo-mastercard-title\" — frb-cc-logo-mastercard-title is not in the document."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "d49a328b24cb",
+      "rule": "label-wiring",
+      "severity": "serious",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "fieldset:nth-of-type(3) > div > div:nth-of-type(1) > label > span:nth-of-type(2) > svg:nth-of-type(3)",
+      "label": "svg \"American Express.st0 { fill:#0071ce; }\"",
+      "facts": {
+        "aria-labelledby": "frb-cc-logo-amex-title",
+        "missingIds": "frb-cc-logo-amex-title",
+        "verdict": "aria-labelledby references an id that does not exist"
+      },
+      "fix": {
+        "summary": "Remove or correct aria-labelledby=\"frb-cc-logo-amex-title\" — frb-cc-logo-amex-title is not in the document."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "39da11f18abb",
+      "rule": "label-wiring",
+      "severity": "serious",
+      "wcag": [
+        "4.1.2 Name, Role, Value (A)"
+      ],
+      "selector": "fieldset:nth-of-type(3) > div > div:nth-of-type(1) > label > span:nth-of-type(2) > svg:nth-of-type(4)",
+      "label": "svg \"JCB\"",
+      "facts": {
+        "aria-labelledby": "frb-cc-logo-jcb-title",
+        "missingIds": "frb-cc-logo-jcb-title",
+        "verdict": "aria-labelledby references an id that does not exist"
+      },
+      "fix": {
+        "summary": "Remove or correct aria-labelledby=\"frb-cc-logo-jcb-title\" — frb-cc-logo-jcb-title is not in the document."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "aabdf78c00f9",
+      "rule": "keyboard-reach",
+      "severity": "moderate",
+      "wcag": [
+        "2.4.3 Focus Order (A)"
+      ],
+      "selector": "#p-lang-btn-checkbox",
+      "label": "input [aria-label=\"43 languages\"]",
+      "facts": {
+        "previousTarget": "a \"12 External links\"",
+        "jumpUpPx": 479,
+        "verdict": "Tab order jumps back up the page, so focus does not follow the visual order"
+      },
+      "fix": {
+        "summary": "Reorder the DOM to match the visual order, or move the element so its position matches its place in the sequence."
+      },
+      "context": "desktop 1440x900, light"
+    },
+    {
+      "id": "4265e4f546df",
+      "rule": "label-wiring",
+      "severity": "moderate",
+      "wcag": [
+        "2.5.3 Label in Name (A)"
+      ],
+      "selector": "#mwBA > a:nth-of-type(5)",
+      "label": "a \"Agenda-setting theory §Accessibility\"",
+      "facts": {
+        "visibleText": "Agenda-setting theory §Accessibility",
+        "computedName": "Agenda-setting theory § Accessibility",
+        "verdict": "accessible name does not contain the visible label"
+      },
+      "fix": {
+        "summary": "Make the accessible name start with the visible text \"Agenda-setting theory §Accessibility\" (voice users say what they see).",
+        "html": "aria-label=\"Agenda-setting theory §Accessibility Agenda-setting theory § Accessibility\""
       },
       "context": "desktop 1440x900, light"
     }

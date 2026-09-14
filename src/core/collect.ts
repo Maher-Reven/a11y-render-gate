@@ -136,6 +136,31 @@ export async function collect(
         return false;
       };
 
+      /**
+       * Click handlers as the framework stored them.
+       *
+       * React and Vue keep props on internal, version-suffixed keys attached to
+       * the DOM node. Reading those is the only reliable way to see a JSX
+       * onClick, because the listener itself lives on the root container.
+       */
+      const frameworkHandler = (el: Element): boolean => {
+        const anyEl = el as any;
+        for (const key of Object.keys(anyEl)) {
+          if (key.startsWith("__reactProps$") || key.startsWith("__reactEventHandlers$")) {
+            const props = anyEl[key];
+            if (props && (typeof props.onClick === "function" || typeof props.onKeyDown === "function")) {
+              return true;
+            }
+          }
+        }
+        // Vue 3 keeps the vnode on the element; its props carry the listeners.
+        const vnode = anyEl.__vnode;
+        if (vnode?.props && (vnode.props.onClick || vnode.props.onclick)) return true;
+        return false;
+      };
+
+      const NATIVE_FOCUSABLE = new Set(["a", "button", "input", "select", "textarea", "summary"]);
+
       const hasClickAffordance = (el: Element, style: CSSStyleDeclaration): boolean => {
         // `onclick` as an attribute or property is the reliable half; `cursor:
         // pointer` on a non-interactive tag is the heuristic half. React attaches
@@ -234,11 +259,28 @@ export async function collect(
           isTabbable(el, style) ||
           hasClickAffordance(el, style);
 
-        // "Inline inside prose" powers the WCAG 2.2 target-size inline exception.
-        const parentText = (el.parentElement?.textContent ?? "").replace(/\s+/g, " ").trim();
+        // "Inline inside prose" powers the WCAG 2.2 target-size inline exception,
+        // whose wording is that the target sits in a sentence or is constrained by
+        // the line-height of surrounding non-target text.
+        //
+        // Comparing against the *immediate* parent is not enough: a link wrapped
+        // in a tight inline span (`<span><a>↑</a></span>`) has a parent whose text
+        // is just the link, so it reads as standalone and gets flagged — which is
+        // how Wikipedia's citation backlinks produced dozens of false failures.
+        // The containing block is what actually holds the sentence.
+        let blockAncestor: Element | null = el.parentElement;
+        while (
+          blockAncestor &&
+          getComputedStyle(blockAncestor).display.startsWith("inline")
+        ) {
+          blockAncestor = blockAncestor.parentElement;
+        }
+        const surroundingText = (blockAncestor?.textContent ?? "")
+          .replace(/\s+/g, " ")
+          .trim();
         const inlineInText =
           (style.display === "inline" || style.display === "inline-block") &&
-          parentText.length > text.length + 10;
+          surroundingText.length > text.length + 10;
 
         const idx = snapshots.length;
 
@@ -253,6 +295,17 @@ export async function collect(
         el.setAttribute(IDX_ATTR, String(idx));
 
         const tiAttr = el.getAttribute("tabindex");
+
+        // A control nested inside another control is not a separate target: the
+        // span inside a link is the link, and flagging it is noise.
+        let hasInteractiveAncestor = false;
+        for (let a = el.parentElement; a; a = a.parentElement) {
+          const tag = a.tagName.toLowerCase();
+          if (NATIVE_FOCUSABLE.has(tag) || a.hasAttribute("tabindex") || a.getAttribute("role") === "button") {
+            hasInteractiveAncestor = true;
+            break;
+          }
+        }
 
         snapshots.push({
           idx,
@@ -307,6 +360,8 @@ export async function collect(
             tabindex: tiAttr === null ? undefined : parseInt(tiAttr, 10),
           },
           interactive,
+          frameworkClickHandler: frameworkHandler(el),
+          hasInteractiveAncestor,
           tabbable: isTabbable(el, style),
           visible,
           isLeaf: el.children.length === 0,

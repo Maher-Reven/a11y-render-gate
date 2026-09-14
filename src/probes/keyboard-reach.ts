@@ -40,30 +40,40 @@ export async function keyboardReachProbe(
     if (!s.visible) continue;
 
     // --- Interactive but unreachable ---------------------------------------
-    const hasHandler = clickable.has(s.idx);
-    const looksInteractive = hasHandler || s.styles.cursor === "pointer";
+    //
+    // Only a *confirmed* handler counts. `cursor: pointer` alone was tried and
+    // is unusable: on a real page it flagged 454 elements, every one of them a
+    // span inside a link or a label delegating to its input, and not a single
+    // true positive among them. A rule that wrong gets the whole tool switched
+    // off, so the weaker signal is gone entirely — under-reporting here is far
+    // cheaper than being ignored.
+    const hasHandler = clickable.has(s.idx) || s.frameworkClickHandler;
     const isNativelyInteractive = [
       "a", "button", "input", "select", "textarea", "summary",
     ].includes(s.tag);
 
     if (
-      looksInteractive &&
+      hasHandler &&
       !s.tabbable &&
       !isNativelyInteractive &&
       !hasInteractiveRole(s) &&
+      // A control inside another control is that control, not a second one.
+      !s.hasInteractiveAncestor &&
+      // A <label> is meant to forward clicks to its input, which is focusable.
+      s.tag !== "label" &&
       // A pointer cursor on a big container is usually decorative, not a control.
       s.rect.w * s.rect.h < 120_000
     ) {
       findings.push({
         id: makeFindingId("keyboard-reach", s.selector, "unreachable"),
         rule: "keyboard-reach",
-        severity: hasHandler ? "critical" : "serious",
+        severity: "critical",
         wcag: ["2.1.1 Keyboard (A)", "4.1.2 Name, Role, Value (A)"],
         selector: s.selector,
         label: describeElement(s),
         facts: {
           tag: s.tag,
-          hasClickHandler: hasHandler,
+          handlerSource: s.frameworkClickHandler ? "framework props (e.g. JSX onClick)" : "addEventListener",
           cursor: s.styles.cursor,
           tabbable: false,
           role: s.attrs.role ?? "(none)",
@@ -151,8 +161,10 @@ async function findClickHandlers(
     (s) =>
       s.visible &&
       !s.tabbable &&
+      !s.hasInteractiveAncestor &&
+      s.tag !== "label" &&
       !["a", "button", "input", "select", "textarea", "summary"].includes(s.tag) &&
-      (s.styles.cursor === "pointer" || s.attrs.role !== undefined || s.isLeaf),
+      (s.styles.cursor === "pointer" || s.attrs.role !== undefined),
   );
   if (candidates.length === 0) return found;
 

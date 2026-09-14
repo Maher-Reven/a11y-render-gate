@@ -18,7 +18,11 @@ export {
 } from "./core/findings.js";
 export { formatReport, formatOneLine } from "./report/format.js";
 export { writeRunArtifact, readLastRun, outPath, type RunArtifact } from "./report/json.js";
-export { type PageSource, type Action, SourceError, describeSource } from "./sources/index.js";
+export {
+  loadSource, describeSource, SourceError,
+  type PageSource, type Action, type LoadedSource,
+} from "./sources/index.js";
+export { GateError, isGateError } from "./core/errors.js";
 export * from "./core/color.js";
 export type { ElementSnapshot, CollectResult, Viewport, Theme, Rect } from "./core/types.js";
 

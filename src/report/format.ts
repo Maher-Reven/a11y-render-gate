@@ -222,8 +222,8 @@ function factLine(f: Finding): string {
   }
 
   if (f.rule === "keyboard-reach") {
-    if (facts.hasClickHandler !== undefined) {
-      return `<${facts.tag}> has a click handler, cursor:${facts.cursor}, but is not tabbable`;
+    if (facts.handlerSource !== undefined) {
+      return `<${facts.tag}> has a click handler (${facts.handlerSource}) but Tab cannot reach it`;
     }
     if (facts.tabindex !== undefined) return `tabindex="${facts.tabindex}"`;
   }

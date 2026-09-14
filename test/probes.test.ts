@@ -113,9 +113,17 @@ describe("keyboard reach", () => {
     expect(classes).not.toContain("roled");
     expect(classes).not.toContain("link");
 
+    // A confirmed handler is now the only trigger. `cursor: pointer` alone flagged
+    // 454 elements on one real page — spans inside links, labels forwarding to
+    // their input — and zero true positives, so it no longer counts on its own.
+    const cursorOnly = collected.snapshots.filter(
+      (s) => s.styles.cursor === "pointer" && !s.frameworkClickHandler && s.visible,
+    );
+    expect(cursorOnly.length).toBeGreaterThan(0);
+
     // The handler was attached via addEventListener, which no DOM inspection sees.
     const divButton = findings.find((f) => firstClass(f, collected) === "div-button")!;
-    expect(divButton.facts.hasClickHandler).toBe(true);
+    expect(divButton.facts.handlerSource).toBe("addEventListener");
     expect(divButton.severity).toBe("critical");
     expect(divButton.fix.html).toContain("<button");
   }, 30_000);
