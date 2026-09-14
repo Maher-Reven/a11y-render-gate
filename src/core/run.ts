@@ -61,7 +61,12 @@ export async function runOnce(
   const started = Date.now();
   const wants = (rule: string) => !options.only?.length || options.only.includes(rule);
 
-  const session = await createSession({ viewport, theme });
+  const session = await createSession({
+    viewport,
+    theme,
+    userAgent: config.userAgent,
+    extraHTTPHeaders: config.headers,
+  });
   let loaded: { dispose?: () => Promise<void> } = {};
 
   try {

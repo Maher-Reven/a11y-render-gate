@@ -50,6 +50,10 @@ export interface GateConfig {
   outDir: string;
   /** Globs the Stop hook treats as UI work worth re-checking. */
   uiGlobs: string[];
+  /** User-agent override, for sites that reject the default headless string. */
+  userAgent?: string;
+  /** Extra request headers, e.g. auth for a staging environment. */
+  headers?: Record<string, string>;
   /** Resolved directory the config was found in. */
   rootDir: string;
 }

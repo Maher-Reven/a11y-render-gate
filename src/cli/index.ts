@@ -30,6 +30,7 @@ program
   .option("--props <json>", "JSON props to mount the component with")
   .option("--wrapper <path>", "module exporting a provider wrapper")
   .option("--within <selector>", "check only this subtree")
+  .option("--user-agent <ua>", "user-agent string (some sites reject headless)")
   .option("--storybook-url <url>", "Storybook root URL")
   .option("--only <rules>", "comma-separated rules to run")
   .option("--viewport <name>", "run only this configured viewport")
@@ -42,6 +43,7 @@ program
     const config = loadConfig();
     if (opts.level) config.level = opts.level === "AAA" ? "AAA" : "AA";
     if (opts.storybookUrl) config.sources.storybookUrl = opts.storybookUrl;
+    if (opts.userAgent) config.userAgent = opts.userAgent;
 
     let sources: PageSource[];
     try {

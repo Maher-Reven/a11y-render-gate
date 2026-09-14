@@ -65,6 +65,9 @@ export function contrastProbe(
 
   for (const s of collected.snapshots) {
     if (!s.visible) continue;
+    // A skip link is white-on-white until focused, by design. Reporting it would
+    // be failing someone for doing the right thing.
+    if (s.visuallyHidden) continue;
     // Only elements that directly render text: an ancestor's `color` is irrelevant
     // if every visible glyph belongs to a descendant with its own colour.
     if (!s.ownText) continue;

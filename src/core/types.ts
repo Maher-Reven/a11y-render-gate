@@ -100,6 +100,12 @@ export interface ElementSnapshot {
   tabbable: boolean;
   /** Rendered, non-zero-size, not visibility:hidden, not aria-hidden. */
   visible: boolean;
+  /**
+   * Present for screen readers but clipped or parked off-screen — `sr-only`,
+   * skip links. Excluded from contrast, because measuring a deliberately hidden
+   * element reports a failure on correct accessibility work.
+   */
+  visuallyHidden: boolean;
   /** True when the element has no element children, i.e. it directly renders text. */
   isLeaf: boolean;
   /** True when this element sits inline inside a run of prose. */

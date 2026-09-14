@@ -207,15 +207,9 @@ export async function collect(
         // aria-hidden anywhere up the chain removes it from the a11y tree entirely.
         const ariaHidden = el.closest('[aria-hidden="true"]') !== null;
 
-        const visible =
-          r.width > 0 &&
-          r.height > 0 &&
-          style.display !== "none" &&
-          style.visibility !== "hidden" &&
-          parseFloat(style.opacity || "1") > 0.01 &&
-          !ariaHidden;
-
-        // Build the background stack and effective opacity in one ancestor walk.
+        // The ancestor walk must come first: visibility depends on effective
+        // opacity, and an element's own opacity says nothing about whether a
+        // transparent ancestor has already hidden it.
         const backgroundStack: string[] = [];
         let hasImageBackground = false;
         let effectiveOpacity = 1;
@@ -238,6 +232,39 @@ export async function collect(
             if (!Number.isNaN(op)) effectiveOpacity *= op;
           }
         }
+
+        /**
+         * Visually hidden but exposed to assistive tech — the `sr-only` and
+         * skip-link patterns.
+         *
+         * These are *correct* technique. They render as white-on-white, a 1px
+         * clipped box, or a fully transparent element parked above the viewport,
+         * so measuring their contrast reports a failure against the very markup
+         * someone added to help. What matters is their focused state, which the
+         * focus probes still see.
+         *
+         * Effective opacity is the load-bearing check: a skip link is commonly a
+         * transparent <a> wrapping an opaque <span>, so the span's own opacity is
+         * 1 and only the inherited value reveals that nothing is on screen.
+         */
+        const clipHidden =
+          style.clip === "rect(0px, 0px, 0px, 0px)" ||
+          style.clipPath === "inset(50%)" ||
+          style.clipPath === "inset(100%)";
+        const tinyBox = r.width <= 1 || r.height <= 1;
+        // At load, scrollY is 0, so anything entirely above or left of the
+        // viewport is parked there deliberately rather than merely scrolled away.
+        const parkedOffscreen = r.bottom <= 0 || r.right <= 0;
+        const transparent = effectiveOpacity <= 0.01;
+        const visuallyHidden = clipHidden || tinyBox || parkedOffscreen || transparent;
+
+        const visible =
+          r.width > 0 &&
+          r.height > 0 &&
+          style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          !transparent &&
+          !ariaHidden;
 
         let ownText = "";
         for (const node of Array.from(el.childNodes)) {
@@ -360,6 +387,7 @@ export async function collect(
             tabindex: tiAttr === null ? undefined : parseInt(tiAttr, 10),
           },
           interactive,
+          visuallyHidden,
           frameworkClickHandler: frameworkHandler(el),
           hasInteractiveAncestor,
           tabbable: isTabbable(el, style),

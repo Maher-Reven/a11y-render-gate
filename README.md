@@ -218,6 +218,9 @@ unrelated repo behaves.
 }
 ```
 
+Some production sites reject Playwright's default headless user-agent. Set
+`"userAgent"` (or pass `--user-agent`) when a real page returns 403.
+
 Checking `dark` is worth the extra pass: contrast defects hide there constantly,
 because the light palette is the one anybody looks at.
 
@@ -282,7 +285,7 @@ must produce **zero** findings.
 
 Working and covered by tests: the CLI, the MCP server, the blocking Stop hook,
 the Claude Code plugin, all seven rules, and all four sources — `url`, `html`,
-`storybook` and `component`. 72 tests pass, fixture-driven.
+`storybook` and `component`. 76 tests pass, fixture-driven.
 
 Not built yet:
 

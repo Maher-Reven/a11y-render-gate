@@ -55,6 +55,14 @@ export interface SessionOptions {
   /** Disable CSS animations and transitions so screenshots are stable. */
   freezeMotion?: boolean;
   deviceScaleFactor?: number;
+  /**
+   * User-agent string. Playwright's default announces HeadlessChrome, which many
+   * production sites reject outright — and a page you cannot load is a page you
+   * cannot audit.
+   */
+  userAgent?: string;
+  /** Extra headers, e.g. an auth token for a staging environment. */
+  extraHTTPHeaders?: Record<string, string>;
 }
 
 export interface Session {
@@ -71,6 +79,8 @@ export async function createSession(options: SessionOptions = {}): Promise<Sessi
     theme = "light",
     freezeMotion = true,
     deviceScaleFactor = 1,
+    userAgent,
+    extraHTTPHeaders,
   } = options;
 
   const browser = await getBrowser();
@@ -79,6 +89,8 @@ export async function createSession(options: SessionOptions = {}): Promise<Sessi
     colorScheme: theme,
     deviceScaleFactor,
     reducedMotion: freezeMotion ? "reduce" : "no-preference",
+    ...(userAgent ? { userAgent } : {}),
+    ...(extraHTTPHeaders ? { extraHTTPHeaders } : {}),
   });
 
   const page = await context.newPage();
