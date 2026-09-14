@@ -1,7 +1,7 @@
 {
   "name": "a11y-render-gate",
   "displayName": "Accessibility Gate",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Renders the UI an agent just wrote and reports contrast, focus visibility, hit targets and label wiring as computed facts — then blocks the turn until they are fixed.",
   "author": {
     "name": "a11y-render-gate contributors"
