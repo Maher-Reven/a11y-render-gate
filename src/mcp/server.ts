@@ -84,13 +84,14 @@ server.registerTool(
       return errorResult(err instanceof Error ? err.message : String(err));
     }
 
-    const viewports =
-      args.viewport === "both"
-        ? config.viewports
-        : args.viewport
-          ? config.viewports.filter((v) => v.name === args.viewport) ??
-            config.viewports.slice(0, 1)
-          : config.viewports;
+    // `filter` returns [] rather than null, so the old `??` fallback here was
+    // dead code. Name the real behaviour instead: asking for a viewport this
+    // project has not configured falls back to the configured set rather than
+    // silently checking nothing.
+    const named = args.viewport && args.viewport !== "both"
+      ? config.viewports.filter((v) => v.name === args.viewport)
+      : [];
+    const viewports = named.length > 0 ? named : config.viewports;
     const themes: ("light" | "dark")[] =
       args.theme === "both" ? ["light", "dark"] : args.theme ? [args.theme] : config.themes;
 
