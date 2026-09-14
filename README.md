@@ -1,4 +1,7 @@
-# a11y-gate
+# a11y-render-gate
+
+[![npm](https://img.shields.io/npm/v/a11y-render-gate)](https://www.npmjs.com/package/a11y-render-gate)
+[![CI](https://github.com/Maher-Reven/a11y-render-gate/actions/workflows/ci.yml/badge.svg)](https://github.com/Maher-Reven/a11y-render-gate/actions/workflows/ci.yml)
 
 **An accessibility gate inside the agent loop.**
 
@@ -8,11 +11,11 @@ with no replacement. Then it says "done." It cannot see the result, so it cannot
 know. The human reviewing it usually can't either — nobody eyeballs a contrast
 ratio.
 
-`a11y-gate` renders the UI the agent just wrote, measures it, and hands back
+`a11y-render-gate` renders the UI the agent just wrote, measures it, and hands back
 **computed facts with fixes attached** — then blocks the turn until they're fixed.
 
 ```
-a11y-gate FAIL  http://localhost:5173/checkout
+a11y-render-gate FAIL  http://localhost:5173/checkout
 desktop 1440x900, light · 47 elements · 1.2s
 
 critical focus-visible  ×4
@@ -54,7 +57,7 @@ Two things make this different:
 axe:        color-contrast: Elements must have sufficient color contrast (serious)
             <button class="btn-secondary">Continue</button>
 
-a11y-gate:  #8a8a8a on #ffffff = 3.45:1, need 4.5:1 (14px, normal)
+a11y-render-gate:  #8a8a8a on #ffffff = 3.45:1, need 4.5:1 (14px, normal)
             → Set color to #767676 (4.54:1 against #ffffff)
 ```
 
@@ -71,27 +74,10 @@ generated UI because every CSS reset kills the default outline.
 
 ## Install
 
-Not on npm yet, so install from source. `npm install` builds it for you.
-
 ```bash
-git clone https://github.com/Maher-Reven/a11y-gate.git
-cd a11y-gate
-npm install                        # installs deps and builds dist/
+npm install -D a11y-render-gate
 npx playwright install chromium    # ~150MB, one time
-node dist/cli/index.js --help
-```
-
-Check everything is wired up:
-
-```bash
-node dist/cli/index.js doctor
-```
-
-To use it inside another project, link it:
-
-```bash
-npm link                    # from the a11y-gate directory
-cd ~/your-project && a11y-gate init
+npx a11y-render-gate doctor        # check everything is wired up
 ```
 
 Requires **Node 20+**. Chromium is the only browser used.
@@ -101,21 +87,21 @@ Requires **Node 20+**. Chromium is the only browser used.
 Bundles the MCP server, the blocking Stop hook, and the skill in one unit:
 
 ```bash
-claude --plugin-dir /path/to/a11y-gate
+claude --plugin-dir /path/to/a11y-render-gate
 ```
 
 The plugin runs `dist/`, so it needs a build first — `npm install` in the
-a11y-gate directory is enough.
+a11y-render-gate directory is enough.
 
 ---
 
 ## Use
 
 ```bash
-a11y-gate check http://localhost:5173/checkout   # a running app
-a11y-gate check ./component.html                 # a standalone file
-a11y-gate check --story ui-button--secondary     # a Storybook story
-a11y-gate doctor                                 # what can it currently reach?
+a11y-render-gate check http://localhost:5173/checkout   # a running app
+a11y-render-gate check ./component.html                 # a standalone file
+a11y-render-gate check --story ui-button--secondary     # a Storybook story
+a11y-render-gate doctor                                 # what can it currently reach?
 ```
 
 Exit codes: `0` pass, `1` findings at or above your threshold, `2` couldn't check
@@ -166,7 +152,7 @@ a11y_check({ url: "/cart", actions: [{ click: ".open-cart" }, { wait: 300 }] })
 
 ## Configuration
 
-`a11y-gate.config.json`. **Its presence is the opt-in** — the Stop hook does
+`a11y-render-gate.config.json`. **Its presence is the opt-in** — the Stop hook does
 nothing in a project without one, so installing the plugin never changes how an
 unrelated repo behaves.
 
@@ -189,7 +175,7 @@ unrelated repo behaves.
   },
   "ignore": [".third-party-widget"],
   "failOn": ["critical", "serious"],
-  "baseline": ".a11y-gate/baseline.json"
+  "baseline": ".a11y-render-gate/baseline.json"
 }
 ```
 
@@ -201,8 +187,8 @@ because the light palette is the one anybody looks at.
 The first run on a real app produces a lot. Draw a line and hold it:
 
 ```bash
-a11y-gate check /
-a11y-gate baseline accept --note "pre-existing, tracked in PROJ-482"
+a11y-render-gate check /
+a11y-render-gate baseline accept --note "pre-existing, tracked in PROJ-482"
 ```
 
 Only **new** findings fail from now on. Without this step the gate blocks
@@ -217,7 +203,7 @@ Five guards run before it is ever willing to block:
 
 ```
 1. stop_hook_active           → exit 0   never loops
-2. A11Y_GATE_DISABLE set      → exit 0   escape hatch
+2. A11Y_RENDER_GATE_DISABLE   → exit 0   escape hatch
 3. no config in the project   → exit 0   opt-in only
 4. no UI files changed        → exit 0   git-aware
 5. dev server unreachable     → exit 0   never block on infrastructure
@@ -241,7 +227,7 @@ per check instead of one per rule.
 that expensive gets called once and then avoided, which defeats the point, since
 the value is in re-running after a fix. Target is ~1200 tokens: severity ordering,
 identical fixes collapsed, capped per rule, full JSON written to
-`.a11y-gate/last-run.json` as the escape valve. Re-runs report movement
+`.a11y-render-gate/last-run.json` as the escape valve. Re-runs report movement
 (`2 fixed · 1 still failing · 0 new`) rather than restating everything.
 
 **False positives are worse than misses.** For a gate, a wrong finding costs more
@@ -267,7 +253,6 @@ Not built yet:
   absent rather than half-working on purpose.
 - **Source mapping** — findings carry the offending element's classes, but not a
   `file:line`.
-- **Not yet published to npm.** Install from source for now.
 
 Interfaces may change before 1.0.
 

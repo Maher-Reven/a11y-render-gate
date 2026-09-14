@@ -1,5 +1,5 @@
 {
-  "name": "a11y-gate",
+  "name": "a11y-render-gate",
   "version": "0.1.0",
   "description": "An accessibility gate inside the agent loop. Renders the UI an agent just wrote and reports contrast, focus visibility, hit targets and label wiring as computed facts with fix-shaped payloads.",
   "license": "MIT",
@@ -8,9 +8,9 @@
     "node": ">=20"
   },
   "bin": {
-    "a11y-gate": "./dist/cli/index.js",
-    "a11y-gate-mcp": "./dist/mcp/server.js",
-    "a11y-gate-hook": "./dist/hook/stop-gate.js"
+    "a11y-render-gate": "./dist/cli/index.js",
+    "a11y-render-gate-mcp": "./dist/mcp/server.js",
+    "a11y-render-gate-hook": "./dist/hook/stop-gate.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -65,10 +65,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Maher-Reven/a11y-gate.git"
+    "url": "git+https://github.com/Maher-Reven/a11y-render-gate.git"
   },
   "bugs": {
-    "url": "https://github.com/Maher-Reven/a11y-gate/issues"
+    "url": "https://github.com/Maher-Reven/a11y-render-gate/issues"
   },
-  "homepage": "https://github.com/Maher-Reven/a11y-gate#readme"
+  "homepage": "https://github.com/Maher-Reven/a11y-render-gate#readme"
 }

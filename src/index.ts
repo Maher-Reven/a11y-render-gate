@@ -1,5 +1,5 @@
 /**
- * a11y-gate — an accessibility gate inside the agent loop.
+ * a11y-render-gate — an accessibility gate inside the agent loop.
  *
  * Renders the UI, measures it, and reports defects as computed facts with
  * fix-shaped payloads rather than rule names for a human to interpret later.

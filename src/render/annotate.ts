@@ -3,7 +3,7 @@ import { IDX_ATTR } from "../core/collect.js";
 import type { Finding } from "../core/findings.js";
 import type { CollectResult } from "../core/types.js";
 
-const OVERLAY_ID = "a11y-gate-overlay";
+const OVERLAY_ID = "a11y-render-gate-overlay";
 
 export interface AnnotateOptions {
   /** Max boxes drawn; beyond this the image stops communicating anything. */

@@ -3,3 +3,4 @@ dist/
 .a11y-gate/
 *.log
 .DS_Store
+*.tgz

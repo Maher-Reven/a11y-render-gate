@@ -11,11 +11,11 @@ const HOOK = join(here, "..", "dist", "hook", "stop-gate.js");
 const temps: string[] = [];
 
 function project(withConfig: boolean): string {
-  const dir = mkdtempSync(join(tmpdir(), "a11y-gate-hook-"));
+  const dir = mkdtempSync(join(tmpdir(), "a11y-render-gate-hook-"));
   temps.push(dir);
   if (withConfig) {
     writeFileSync(
-      join(dir, "a11y-gate.config.json"),
+      join(dir, "a11y-render-gate.config.json"),
       JSON.stringify({ sources: { baseUrl: "http://127.0.0.1:59999" } }),
     );
   }
@@ -114,11 +114,11 @@ describe("Stop hook blocking", () => {
     await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const port = (server.address() as { port: number }).port;
 
-    const cwd = mkdtempSync(join(tmpdir(), "a11y-gate-block-"));
+    const cwd = mkdtempSync(join(tmpdir(), "a11y-render-gate-block-"));
     temps.push(cwd);
     initGitRepo(cwd);
     writeFileSync(
-      join(cwd, "a11y-gate.config.json"),
+      join(cwd, "a11y-render-gate.config.json"),
       JSON.stringify({ sources: { baseUrl: `http://127.0.0.1:${port}`, routes: ["/"] } }),
     );
     // A changed UI file is what makes the gate consider the turn worth checking.
@@ -149,7 +149,7 @@ describe("Stop hook blocking", () => {
     // Exit 2 is what prevents the turn from ending.
     expect(status).toBe(2);
     // And the reason handed back has to be work, not a complaint.
-    expect(stderr).toContain("a11y-gate FAIL");
+    expect(stderr).toContain("a11y-render-gate FAIL");
     expect(stderr).toContain("focus-visible");
     expect(stderr).toContain("0 pixels change when focused");
     expect(stderr).toMatch(/Fix them and re-run/);

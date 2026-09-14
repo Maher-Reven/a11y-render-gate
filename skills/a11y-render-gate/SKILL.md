@@ -1,5 +1,5 @@
 ---
-name: a11y-gate
+name: a11y-render-gate
 description: Check rendered UI for accessibility defects before calling UI work done. Use whenever you have written or changed anything that renders — a component, a page, a stylesheet, a design token, a theme — and before reporting that UI work is complete. Also use when asked about contrast, focus rings, tap targets, labels, keyboard access, WCAG, or accessibility generally.
 ---
 

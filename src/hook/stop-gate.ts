@@ -39,7 +39,7 @@ async function main(): Promise<never> {
   if (input.stop_hook_active === true) return exit(0);
 
   // 2. Explicit escape hatch.
-  if (process.env.A11Y_GATE_DISABLE) return exit(0);
+  if (process.env.A11Y_RENDER_GATE_DISABLE || process.env.A11Y_GATE_DISABLE) return exit(0);
 
   // 3. Opt-in per project: no config file, no gate. Installing the plugin must
   //    not change how any unrelated repository behaves.
@@ -58,7 +58,7 @@ async function main(): Promise<never> {
   if (sources.length === 0) return exit(0);
   if (config.sources.baseUrl && !(await reachable(config.sources.baseUrl))) {
     process.stderr.write(
-      `a11y-gate: skipped — ${config.sources.baseUrl} is not reachable. ` +
+      `a11y-render-gate: skipped — ${config.sources.baseUrl} is not reachable. ` +
         "Start the dev server to enable the accessibility gate.\n",
     );
     return exit(0);
@@ -87,12 +87,12 @@ async function main(): Promise<never> {
     await closeBrowser();
     if (isGateError(err)) {
       // Cannot check is not the same as failed. Never block on it.
-      process.stderr.write(`a11y-gate: skipped — ${err.message}\n  ${err.remedy}\n`);
+      process.stderr.write(`a11y-render-gate: skipped — ${err.message}\n  ${err.remedy}\n`);
       return exit(0);
     }
     // An internal error in the gate is our bug, not the user's. Never block on it.
     process.stderr.write(
-      `a11y-gate: skipped — internal error: ${err instanceof Error ? err.message : String(err)}\n`,
+      `a11y-render-gate: skipped — internal error: ${err instanceof Error ? err.message : String(err)}\n`,
     );
     return exit(0);
   }
@@ -117,7 +117,7 @@ async function main(): Promise<never> {
   writeState(config, { fingerprint, verdict, at: new Date().toISOString() });
 
   if (verdict === "pass") {
-    process.stderr.write(`a11y-gate: pass (${checked})\n`);
+    process.stderr.write(`a11y-render-gate: pass (${checked})\n`);
     return exit(0);
   }
 
@@ -138,7 +138,7 @@ async function main(): Promise<never> {
   process.stderr.write(
     `${report}\n\n` +
       "These are blocking accessibility defects in UI changed this turn. " +
-      "Fix them and re-run the check (a11y_check, or `npx a11y-gate check`) before finishing. " +
+      "Fix them and re-run the check (a11y_check, or `npx a11y-render-gate check`) before finishing. " +
       "If a finding is pre-existing debt the user has chosen not to fix, ask them before " +
       "accepting it into the baseline.\n",
   );
@@ -263,6 +263,6 @@ function exit(code: number): never {
 
 main().catch(async (err) => {
   await closeBrowser().catch(() => {});
-  process.stderr.write(`a11y-gate: hook error, not blocking — ${err}\n`);
+  process.stderr.write(`a11y-render-gate: hook error, not blocking — ${err}\n`);
   process.exit(0);
 });

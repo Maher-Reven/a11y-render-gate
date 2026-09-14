@@ -14,7 +14,7 @@ import { readLastRun, writeRunArtifact } from "../report/json.js";
 const program = new Command();
 
 program
-  .name("a11y-gate")
+  .name("a11y-render-gate")
   .description("Render the UI and report accessibility defects as computed facts.")
   .version("0.1.0");
 
@@ -118,13 +118,13 @@ program
     } catch (err) {
       await closeBrowser();
       if (isGateError(err)) {
-        console.error(`a11y-gate: ${err.message}\n  ${err.remedy}`);
+        console.error(`a11y-render-gate: ${err.message}\n  ${err.remedy}`);
         // Exit 2 distinguishes "could not check" from "checked and failed", so CI
         // and the Stop hook can treat an unreachable dev server as not-a-failure.
         process.exit(2);
       }
       // Anything left really is our bug, and a stack is the right response.
-      console.error(`a11y-gate: ${err instanceof Error ? err.stack : String(err)}`);
+      console.error(`a11y-render-gate: ${err instanceof Error ? err.stack : String(err)}`);
       process.exit(2);
     }
   });
@@ -136,7 +136,7 @@ program
   .action((opts) => {
     const existing = findConfigFile();
     if (existing && !opts.force) {
-      console.log(`a11y-gate: config already exists at ${existing}`);
+      console.log(`a11y-render-gate: config already exists at ${existing}`);
       console.log("Pass --force to overwrite it.");
       return;
     }
@@ -157,16 +157,16 @@ program
       rules: {},
       ignore: [],
       failOn: ["critical", "serious"],
-      baseline: ".a11y-gate/baseline.json",
-      outDir: ".a11y-gate",
+      baseline: ".a11y-render-gate/baseline.json",
+      outDir: ".a11y-render-gate",
     };
     writeFileSync(path, `${JSON.stringify(starter, null, 2)}\n`, "utf8");
-    console.log(`a11y-gate: wrote ${path}`);
+    console.log(`a11y-render-gate: wrote ${path}`);
     console.log("");
     console.log("Next:");
     console.log("  1. Set sources.baseUrl to your dev server.");
-    console.log("  2. Run `a11y-gate check /` with the dev server running.");
-    console.log("  3. Run `a11y-gate baseline accept` to draw a line under existing debt.");
+    console.log("  2. Run `a11y-render-gate check /` with the dev server running.");
+    console.log("  3. Run `a11y-render-gate baseline accept` to draw a line under existing debt.");
     console.log("");
     console.log("The presence of this file is what enables the Claude Code Stop hook,");
     console.log("so no other project on this machine changes behaviour.");
@@ -182,13 +182,13 @@ baseline
     const config = loadConfig();
     const last = readLastRun(config);
     if (!last) {
-      fail("No previous run found. Run `a11y-gate check` first.");
+      fail("No previous run found. Run `a11y-render-gate check` first.");
       return;
     }
     const updated = acceptIntoBaseline(readBaseline(config), last.findings, opts.note);
     const path = writeBaseline(config, updated);
     console.log(
-      `a11y-gate: accepted ${last.findings.length} finding(s) into ${path}.\n` +
+      `a11y-render-gate: accepted ${last.findings.length} finding(s) into ${path}.\n` +
         "Only new findings will fail from now on.",
     );
   });
@@ -200,14 +200,14 @@ baseline
     const config = loadConfig();
     const last = readLastRun(config);
     if (!last) {
-      fail("No previous run found. Run `a11y-gate check` first.");
+      fail("No previous run found. Run `a11y-render-gate check` first.");
       return;
     }
     const current = new Set(last.findings.map((f) => f.id));
     const existing = readBaseline(config);
     const stale = existing.entries.filter((e) => !current.has(e.id));
     const path = writeBaseline(config, pruneBaseline(existing, stale));
-    console.log(`a11y-gate: removed ${stale.length} stale entr(ies) from ${path}.`);
+    console.log(`a11y-render-gate: removed ${stale.length} stale entr(ies) from ${path}.`);
   });
 
 baseline
@@ -217,7 +217,7 @@ baseline
     const config = loadConfig();
     const { entries } = readBaseline(config);
     if (entries.length === 0) {
-      console.log("a11y-gate: baseline is empty.");
+      console.log("a11y-render-gate: baseline is empty.");
       return;
     }
     for (const e of entries) {
@@ -319,13 +319,13 @@ async function probeUrl(url: string): Promise<boolean> {
 }
 
 function fail(message: string): void {
-  console.error(`a11y-gate: ${message}`);
+  console.error(`a11y-render-gate: ${message}`);
   process.exitCode = 2;
 }
 
 program.parseAsync(process.argv).catch(async (err) => {
   await closeBrowser();
-  if (isGateError(err)) console.error(`a11y-gate: ${err.message}\n  ${err.remedy}`);
+  if (isGateError(err)) console.error(`a11y-render-gate: ${err.message}\n  ${err.remedy}`);
   else console.error(err instanceof Error ? err.stack : String(err));
   process.exit(2);
 });

@@ -53,8 +53,8 @@ export const DEFAULT_CONFIG: GateConfig = {
   // Only the two severities that represent a real barrier block by default.
   // Blocking on `moderate` out of the box would make the gate feel arbitrary.
   failOn: ["critical", "serious"],
-  baseline: ".a11y-gate/baseline.json",
-  outDir: ".a11y-gate",
+  baseline: ".a11y-render-gate/baseline.json",
+  outDir: ".a11y-render-gate",
   uiGlobs: [
     "**/*.tsx", "**/*.jsx", "**/*.vue", "**/*.svelte", "**/*.astro",
     "**/*.css", "**/*.scss", "**/*.sass", "**/*.less", "**/*.html",
@@ -62,7 +62,7 @@ export const DEFAULT_CONFIG: GateConfig = {
   rootDir: process.cwd(),
 };
 
-export const CONFIG_FILENAMES = ["a11y-gate.config.json", ".a11ygaterc.json"];
+export const CONFIG_FILENAMES = ["a11y-render-gate.config.json", ".a11ygaterc.json"];
 
 /** Walk up from `from` looking for a config file; returns null if none exists. */
 export function findConfigFile(from: string = process.cwd()): string | null {

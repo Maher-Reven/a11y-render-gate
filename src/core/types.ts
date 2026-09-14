@@ -57,7 +57,12 @@ export interface SnapshotAttrs {
  * snapshots in milliseconds.
  */
 export interface ElementSnapshot {
-  /** Index into the snapshot array; also written to the DOM as data-a11y-gate-idx. */
+  /**
+   * Index into the snapshot array; also stamped on the element as
+   * `data-a11y-gate-idx`. The attribute keeps the shorter name on purpose: it is
+   * an internal marker written to every captured element and never user-facing,
+   * so brevity beats matching the package name.
+   */
   idx: number;
   selector: string;
   tag: string;

@@ -15,7 +15,7 @@ import { isGateError } from "../core/errors.js";
 import { type Action, type PageSource } from "../sources/index.js";
 import type { Finding } from "../core/findings.js";
 
-const server = new McpServer({ name: "a11y-gate", version: "0.1.0" });
+const server = new McpServer({ name: "a11y-render-gate", version: "0.1.0" });
 
 const actionSchema = z.union([
   z.object({ click: z.string() }),
@@ -370,7 +370,7 @@ function buildSource(
 }
 
 function errorResult(message: string) {
-  return { isError: true, content: [{ type: "text" as const, text: `a11y-gate: ${message}` }] };
+  return { isError: true, content: [{ type: "text" as const, text: `a11y-render-gate: ${message}` }] };
 }
 
 async function main(): Promise<void> {
@@ -385,6 +385,6 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
 }
 
 main().catch((err) => {
-  console.error(`a11y-gate MCP server failed to start: ${err}`);
+  console.error(`a11y-render-gate MCP server failed to start: ${err}`);
   process.exit(1);
 });

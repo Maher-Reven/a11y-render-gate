@@ -71,7 +71,7 @@ export function formatReport(input: FormatInput, options: FormatOptions = {}): s
 
   if (input.verdict === "pass") {
     lines.push(
-      `${c(ANSI.green + ANSI.bold, "a11y-gate PASS")}  ${input.source}`,
+      `${c(ANSI.green + ANSI.bold, "a11y-render-gate PASS")}  ${input.source}`,
       `${c(ANSI.dim, `${input.context} · ${input.elementsScanned} elements · ${fmtMs(input.durationMs)}`)}`,
     );
     if (suppressed > 0) {
@@ -102,7 +102,7 @@ export function formatReport(input: FormatInput, options: FormatOptions = {}): s
   }
 
   lines.push(
-    `${c(ANSI.red + ANSI.bold, "a11y-gate FAIL")}  ${input.source}`,
+    `${c(ANSI.red + ANSI.bold, "a11y-render-gate FAIL")}  ${input.source}`,
     c(ANSI.dim, `${input.context} · ${input.elementsScanned} elements · ${fmtMs(input.durationMs)}`),
   );
 
