@@ -5,7 +5,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { closeBrowser } from "../core/browser.js";
 import { acceptIntoBaseline, readBaseline, writeBaseline } from "../core/baseline.js";
-import { findConfigFile, loadConfig } from "../core/config.js";
+import { findConfigFile, loadConfig, type GateConfig } from "../core/config.js";
 import { diffFindings } from "../core/findings.js";
 import { runMatrix, runOnce } from "../core/run.js";
 import { annotatedScreenshot } from "../render/annotate.js";
@@ -41,12 +41,36 @@ server.registerTool(
       "(measured by pixel diff), hit-target sizes, accessible names as the browser computes " +
       "them, and controls Tab can never reach. " +
       "Pass exactly one source: `url` (your dev server), `html` (a snippet to render standalone), " +
-      "or `story` (a Storybook story id). Re-run after fixing; it reports what changed.",
+      "`story` (a Storybook story id), or `component` (a module path, rendered in isolation " +
+      "through the project's own Vite build). Re-run after fixing; it reports what changed.",
     inputSchema: {
       url: z.string().optional().describe("URL to check, e.g. http://localhost:5173/checkout"),
       html: z.string().optional().describe("Raw HTML to render standalone"),
       css: z.string().optional().describe("CSS to apply to the `html` source"),
       story: z.string().optional().describe("Storybook story id, e.g. ui-button--secondary"),
+      component: z
+        .string()
+        .optional()
+        .describe(
+          "Path to a component module to render in isolation, e.g. src/ui/Button.tsx. " +
+            "Uses the project's own Vite config, so aliases and CSS work as they do in the app. " +
+            "Requires vite in the project.",
+        ),
+      export: z
+        .string()
+        .optional()
+        .describe("Named export to mount. Defaults to the default export."),
+      props: z
+        .record(z.unknown())
+        .optional()
+        .describe("Props to mount the component with."),
+      wrapper: z
+        .string()
+        .optional()
+        .describe(
+          "Module exporting a provider wrapper (theme, router, store). Needed when the " +
+            "component requires context; it cannot be inferred.",
+        ),
       viewport: z
         .enum(["mobile", "desktop", "both"])
         .optional()
@@ -79,7 +103,7 @@ server.registerTool(
 
     let source: PageSource;
     try {
-      source = buildSource(args, config.sources.baseUrl);
+      source = buildSource(args, config.sources.baseUrl, config.sources.component ?? {});
     } catch (err) {
       return errorResult(err instanceof Error ? err.message : String(err));
     }
@@ -346,20 +370,40 @@ server.registerTool(
 // ---------------------------------------------------------------------------
 
 function buildSource(
-  args: { url?: string; html?: string; css?: string; story?: string; actions?: unknown },
+  args: {
+    url?: string; html?: string; css?: string; story?: string; actions?: unknown;
+    component?: string; export?: string; props?: Record<string, unknown>; wrapper?: string;
+  },
   baseUrl: string | undefined,
+  componentDefaults: NonNullable<GateConfig["sources"]["component"]> = {},
 ): PageSource {
   const actions = args.actions as Action[] | undefined;
-  const provided = [args.url, args.html, args.story].filter(Boolean).length;
+  const provided = [args.url, args.html, args.story, args.component].filter(Boolean).length;
 
   if (provided === 0) {
     if (baseUrl) return { kind: "url", url: baseUrl, actions };
     throw new Error(
-      "Pass one of `url`, `html`, or `story`. (No sources.baseUrl is configured to fall back to.)",
+      "Pass one of `url`, `html`, `story`, or `component`. " +
+        "(No sources.baseUrl is configured to fall back to.)",
     );
   }
-  if (provided > 1) throw new Error("Pass exactly one of `url`, `html`, or `story`.");
+  if (provided > 1) {
+    throw new Error("Pass exactly one of `url`, `html`, `story`, or `component`.");
+  }
 
+  if (args.component) {
+    return {
+      kind: "component",
+      component: args.component,
+      export: args.export,
+      props: args.props,
+      wrapper: args.wrapper ?? componentDefaults.wrapper,
+      root: componentDefaults.root,
+      viteConfig: componentDefaults.viteConfig,
+      framework: componentDefaults.framework,
+      actions,
+    };
+  }
   if (args.story) return { kind: "storybook", story: args.story, actions };
   if (args.html) return { kind: "html", html: args.html, css: args.css, actions };
 

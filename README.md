@@ -101,6 +101,7 @@ a11y-render-gate directory is enough.
 a11y-render-gate check http://localhost:5173/checkout   # a running app
 a11y-render-gate check ./component.html                 # a standalone file
 a11y-render-gate check --story ui-button--secondary     # a Storybook story
+a11y-render-gate check --component src/ui/Button.tsx    # one component, in isolation
 a11y-render-gate doctor                                 # what can it currently reach?
 ```
 
@@ -121,6 +122,41 @@ State behind an interaction is reachable:
 ```js
 a11y_check({ url: "/cart", actions: [{ click: ".open-cart" }, { wait: 300 }] })
 ```
+
+### Checking one component in isolation
+
+No dev server, no Storybook needed — but it does **not** try to reconstruct your
+build. It loads *your* Vite, from *your* `node_modules`, pointed at *your* config,
+so aliases, plugins, PostCSS and Tailwind all apply exactly as they do in the app.
+
+```bash
+a11y-render-gate check --component src/ui/Button.tsx --export Button
+a11y-render-gate check --component src/ui/Card.tsx --props '{"title":"Hello"}'
+```
+
+React, Vue, Svelte and plain modules are supported; the framework comes from your
+`package.json`.
+
+Components that need a router, theme or store need a **wrapper**, because providers
+cannot be inferred from source and guessing produces confident nonsense:
+
+```tsx
+// a11y.wrapper.tsx
+export default function Wrapper({ children }) {
+  return <ThemeProvider><Router>{children}</Router></ThemeProvider>;
+}
+```
+
+```bash
+a11y-render-gate check --component src/ui/Nav.tsx --wrapper ./a11y.wrapper.tsx
+```
+
+A component that throws or renders nothing is reported as an **error**, never as a
+pass. An empty page has no accessibility defects, so silently certifying a broken
+component as accessible would be the worst thing this tool could do.
+
+Requires `vite` in the project. Next.js has no stable programmatic dev server —
+use `url` or `storybook` there.
 
 ---
 
@@ -162,7 +198,8 @@ unrelated repo behaves.
   "sources": {
     "baseUrl": "http://localhost:5173",
     "storybookUrl": "http://localhost:6006",
-    "routes": ["/", "/checkout"]
+    "routes": ["/", "/checkout"],
+    "component": { "wrapper": "./a11y.wrapper.tsx" }
   },
   "viewports": [
     { "name": "mobile",  "width": 390,  "height": 844 },
@@ -242,15 +279,11 @@ must produce **zero** findings.
 ## Status — v0.1.0
 
 Working and covered by tests: the CLI, the MCP server, the blocking Stop hook,
-the Claude Code plugin, and all seven rules. Sources `url`, `html`, and
-`storybook` are implemented. 54 tests pass, fixture-driven.
+the Claude Code plugin, all seven rules, and all four sources — `url`, `html`,
+`storybook` and `component`. 68 tests pass, fixture-driven.
 
 Not built yet:
 
-- **`component` source** — rendering a `.tsx`/`.vue` file in isolation by reusing
-  the project's own Vite config. Currently throws a clear not-implemented error
-  pointing at `url` or `storybook`. This is the highest-risk adapter and it is
-  absent rather than half-working on purpose.
 - **Source mapping** — findings carry the offending element's classes, but not a
   `file:line`.
 

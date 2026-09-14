@@ -1,6 +1,7 @@
 import type { Session } from "../core/browser.js";
 import { prepareSession } from "../core/browser.js";
 import { GateError } from "../core/errors.js";
+import { MOUNT_ID, startComponentHarness, type Framework } from "./component.js";
 
 /** A step the gate performs after load to reach state that only exists after interaction. */
 export type Action =
@@ -47,6 +48,14 @@ export interface ComponentSource extends BaseSource {
   export?: string;
   /** Props to mount with, as JSON. */
   props?: Record<string, unknown>;
+  /** Project root; defaults to the config's directory. */
+  root?: string;
+  /** Module exporting a provider wrapper. Declared, never inferred. */
+  wrapper?: string;
+  /** Explicit vite config path; auto-detected when omitted. */
+  viteConfig?: string;
+  /** Override framework detection. */
+  framework?: Framework;
 }
 
 export type PageSource = UrlSource | HtmlSource | StorybookSource | ComponentSource;
@@ -54,6 +63,18 @@ export type PageSource = UrlSource | HtmlSource | StorybookSource | ComponentSou
 export interface LoadOptions {
   timeout?: number;
   storybookUrl?: string;
+  /** Project root for the component source. */
+  rootDir?: string;
+}
+
+/**
+ * What a load leaves behind that must be cleaned up.
+ *
+ * Only the component source needs this — it owns a Vite dev server that has to
+ * outlive the page load and be shut down afterwards, or the process hangs.
+ */
+export interface LoadedSource {
+  dispose?: () => Promise<void>;
 }
 
 export class SourceError extends GateError {
@@ -74,9 +95,10 @@ export async function loadSource(
   session: Session,
   source: PageSource,
   options: LoadOptions = {},
-): Promise<void> {
+): Promise<LoadedSource> {
   const { timeout = 20_000 } = options;
   const { page } = session;
+  let dispose: (() => Promise<void>) | undefined;
 
   switch (source.kind) {
     case "url": {
@@ -110,15 +132,61 @@ export async function loadSource(
     }
 
     case "component": {
-      throw new SourceError(
-        "The `component` source is not implemented yet.",
-        "Use `url` against your dev server, or `storybook` with a story id.",
-      );
+      const harness = await startComponentHarness({
+        root: source.root ?? options.rootDir ?? process.cwd(),
+        component: source.component,
+        exportName: source.export,
+        props: source.props,
+        wrapper: source.wrapper,
+        viteConfig: source.viteConfig,
+        framework: source.framework,
+      });
+      dispose = harness.close;
+      try {
+        await navigate(page, harness.url, timeout);
+        await assertComponentMounted(page, source.component);
+      } catch (err) {
+        await harness.close();
+        throw err;
+      }
+      break;
     }
   }
 
   await prepareSession(session);
   await runActions(session, source.actions ?? []);
+  return { dispose };
+}
+
+/**
+ * Fail loudly when the component did not render.
+ *
+ * An empty page produces zero findings and therefore reports PASS, which is the
+ * most damaging thing this tool could possibly do: silently telling someone their
+ * broken component is accessible. A mount failure must be an error, not a pass.
+ */
+async function assertComponentMounted(page: Session['page'], component: string): Promise<void> {
+  const state = await page.evaluate(({ mountId }) => {
+    const el = document.getElementById(mountId);
+    return {
+      children: el ? el.children.length : -1,
+      text: (el?.textContent ?? '').trim().length,
+      errors: (window as any).__a11yErrors ?? [],
+    };
+  }, { mountId: MOUNT_ID });
+
+  if (state.errors.length > 0) {
+    throw new SourceError(
+      `${component} threw while mounting: ${state.errors[0]}`,
+      'Fix the component so it renders, or pass the props it needs via component.props.',
+    );
+  }
+  if (state.children <= 0 && state.text === 0) {
+    throw new SourceError(
+      `${component} mounted but rendered nothing.`,
+      'Check the export name, and whether the component needs props or a provider (component.wrapper).',
+    );
+  }
 }
 
 async function navigate(page: Session["page"], url: string, timeout: number): Promise<void> {

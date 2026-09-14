@@ -59,8 +59,14 @@
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/pngjs": "^6.0.5",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
+    "vite": "^6.4.3",
     "vitest": "^2.1.8"
   },
   "repository": {

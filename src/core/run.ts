@@ -62,10 +62,12 @@ export async function runOnce(
   const wants = (rule: string) => !options.only?.length || options.only.includes(rule);
 
   const session = await createSession({ viewport, theme });
+  let loaded: { dispose?: () => Promise<void> } = {};
 
   try {
-    await loadSource(session, source, {
+    loaded = await loadSource(session, source, {
       storybookUrl: config.sources.storybookUrl,
+      rootDir: config.rootDir,
     });
 
     const collected = await collect(session.page, { ignore: config.ignore });
@@ -159,9 +161,11 @@ export async function runOnce(
     if (options.keepSession) result.session = session;
     else await session.close();
 
+    await loaded.dispose?.();
     return result;
   } catch (err) {
     await session.close();
+    await loaded.dispose?.().catch(() => {});
     throw err;
   }
 }

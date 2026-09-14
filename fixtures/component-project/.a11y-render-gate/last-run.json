@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "timestamp": "2026-09-14T09:25:21.828Z",
+  "source": "component: src/ui/GoodButton.tsx",
+  "verdict": "pass",
+  "counts": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "advice": 0
+  },
+  "durationMs": 494,
+  "findings": [],
+  "suppressed": [],
+  "contexts": [
+    "desktop 1440x900, light"
+  ]
+}

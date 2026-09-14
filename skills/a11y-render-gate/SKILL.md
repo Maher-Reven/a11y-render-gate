@@ -22,6 +22,8 @@ Pass exactly one source:
 | A dev server is running | `a11y_check({ url: "http://localhost:5173/checkout" })` |
 | You just wrote a self-contained snippet | `a11y_check({ html: "<button …>", css: "…" })` |
 | The project has Storybook | `a11y_check({ story: "ui-button--secondary" })` |
+| No server running, but the project uses Vite | `a11y_check({ component: "src/ui/Button.tsx", export: "Button" })` |
+| That component needs a provider | add `wrapper: "./a11y.wrapper.tsx"` |
 | The UI is behind an interaction | `a11y_check({ url: "…", actions: [{ click: ".open-cart" }, { wait: 300 }] })` |
 
 If a source will not load, call `a11y_status` to see what is actually reachable

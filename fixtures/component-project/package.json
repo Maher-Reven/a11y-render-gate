@@ -1,0 +1,8 @@
+{
+  "name": "a11y-render-gate-fixture-project",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": { "react": "^18.0.0", "react-dom": "^18.0.0" },
+  "devDependencies": { "vite": "^6.0.0", "@vitejs/plugin-react": "^4.0.0" }
+}

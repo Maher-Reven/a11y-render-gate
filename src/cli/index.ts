@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { Command } from "commander";
 import { closeBrowser } from "../core/browser.js";
 import { acceptIntoBaseline, pruneBaseline, readBaseline, writeBaseline } from "../core/baseline.js";
-import { CONFIG_FILENAMES, DEFAULT_CONFIG, findConfigFile, loadConfig } from "../core/config.js";
+import { CONFIG_FILENAMES, DEFAULT_CONFIG, findConfigFile, loadConfig, type GateConfig } from "../core/config.js";
 import { diffFindings } from "../core/findings.js";
 import { runMatrix } from "../core/run.js";
 import { isGateError } from "../core/errors.js";
@@ -25,6 +25,10 @@ program
   .option("--url <url>", "explicit URL to check")
   .option("--html <path>", "path to an HTML file to render")
   .option("--story <id>", "Storybook story id")
+  .option("--component <path>", "component module to render in isolation")
+  .option("--export <name>", "named export to mount (defaults to the default export)")
+  .option("--props <json>", "JSON props to mount the component with")
+  .option("--wrapper <path>", "module exporting a provider wrapper")
   .option("--storybook-url <url>", "Storybook root URL")
   .option("--only <rules>", "comma-separated rules to run")
   .option("--viewport <name>", "run only this configured viewport")
@@ -40,7 +44,7 @@ program
 
     let source: PageSource;
     try {
-      source = resolveSource(target, opts, config.sources.baseUrl);
+      source = resolveSource(target, opts, config.sources.baseUrl, config.sources.component);
     } catch (err) {
       fail(err instanceof Error ? err.message : String(err));
       return;
@@ -275,7 +279,28 @@ function resolveSource(
   target: string | undefined,
   opts: Record<string, string | undefined>,
   baseUrl: string | undefined,
+  componentDefaults: GateConfig["sources"]["component"] = {},
 ): PageSource {
+  if (opts.component) {
+    let props: Record<string, unknown> | undefined;
+    if (opts.props) {
+      try {
+        props = JSON.parse(opts.props);
+      } catch (err) {
+        throw new Error(`--props is not valid JSON: ${err instanceof Error ? err.message : err}`);
+      }
+    }
+    return {
+      kind: "component",
+      component: opts.component,
+      export: opts.export,
+      props,
+      wrapper: opts.wrapper ?? componentDefaults.wrapper,
+      root: componentDefaults.root,
+      viteConfig: componentDefaults.viteConfig,
+      framework: componentDefaults.framework,
+    };
+  }
   if (opts.story) return { kind: "storybook", story: opts.story, storybookUrl: opts.storybookUrl };
   if (opts.url) return { kind: "url", url: opts.url };
   if (opts.html) return { kind: "html", html: readFileSync(resolve(opts.html), "utf8") };

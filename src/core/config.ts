@@ -25,6 +25,17 @@ export interface GateConfig {
     storybookUrl?: string;
     /** Routes checked when the gate runs with no explicit target. */
     routes?: string[];
+    /**
+     * Defaults for the `component` source. The wrapper is declared here rather
+     * than detected: a component's providers cannot be inferred from its source,
+     * and guessing produces confident nonsense.
+     */
+    component?: {
+      root?: string;
+      wrapper?: string;
+      viteConfig?: string;
+      framework?: 'react' | 'vue' | 'svelte' | 'vanilla';
+    };
   };
   viewports: Viewport[];
   themes: Theme[];
