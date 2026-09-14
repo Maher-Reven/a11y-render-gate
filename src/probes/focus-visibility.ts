@@ -2,7 +2,7 @@ import type { Page } from "playwright";
 import { contrastRatio, formatColor, parseColor, roundRatio, suggestForeground, type Rgba } from "../core/color.js";
 import { IDX_ATTR } from "../core/collect.js";
 import { describeElement, sourceHint } from "../core/describe.js";
-import { makeFindingId, type Finding, type Severity } from "../core/findings.js";
+import { makeFindingId, type ProbeFinding as Finding, type Severity } from "../core/findings.js";
 import { decodePng, diffBitmaps, type DiffResult } from "../core/pixels.js";
 import type { CollectResult, ElementSnapshot } from "../core/types.js";
 

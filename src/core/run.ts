@@ -4,10 +4,12 @@ import { createSession, type Session } from "./browser.js";
 import { collect } from "./collect.js";
 import { DEFAULT_CONFIG, ruleEnabled, type GateConfig } from "./config.js";
 import {
+  attachGroupIds,
   countBySeverity,
   severityRank,
   sortFindings,
   type Finding,
+  type ProbeFinding,
   type RunCounts,
   type Severity,
 } from "./findings.js";
@@ -79,7 +81,9 @@ export async function runOnce(
       ignore: config.ignore,
       within: source.within,
     });
-    const findings: Finding[] = [];
+    // Probes emit findings about elements; defect-class identity is assigned
+    // below, once the whole set is known.
+    const findings: ProbeFinding[] = [];
 
     // --- Passive probes, all pure over the collected snapshots ---------------
 
@@ -147,7 +151,7 @@ export async function runOnce(
     // --- Baseline and verdict ------------------------------------------------
 
     const { active, suppressed, stale } = applyBaseline(
-      sortFindings(findings),
+      attachGroupIds(sortFindings(findings)),
       readBaseline(config),
     );
 

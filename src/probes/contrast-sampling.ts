@@ -2,7 +2,7 @@ import type { Page } from "playwright";
 import { compositeOver, contrastRatio, type Rgba } from "../core/color.js";
 import { IDX_ATTR } from "../core/collect.js";
 import { decodePng, dominantColors } from "../core/pixels.js";
-import type { Finding } from "../core/findings.js";
+import type { ProbeFinding as Finding } from "../core/findings.js";
 import { buildFinding, type PixelSamplingCandidate } from "./contrast.js";
 
 /**

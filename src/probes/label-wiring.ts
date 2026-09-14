@@ -1,6 +1,6 @@
 import { attemptedButEmpty, indexByElement, type AxNode } from "../core/axtree.js";
 import { describeElement, sourceHint } from "../core/describe.js";
-import { makeFindingId, type Finding, type Severity } from "../core/findings.js";
+import { makeFindingId, type ProbeFinding as Finding, type Severity } from "../core/findings.js";
 import type { CollectResult, ElementSnapshot } from "../core/types.js";
 
 /** Controls that must carry an accessible name to be operable. */

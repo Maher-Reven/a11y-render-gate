@@ -4,11 +4,24 @@ import type { Finding } from "./findings.js";
 import type { GateConfig } from "./config.js";
 
 export interface BaselineEntry {
+  /** Per-element id, kept for provenance. */
   id: string;
+  /**
+   * The defect class this entry accepts.
+   *
+   * Matching happens here rather than on `id`, because per-element ids embed the
+   * selector and real pages are full of volatile ones — a news front page's
+   * per-story ids change hourly, so an id-keyed baseline goes stale on the next
+   * run and silently stops suppressing anything. Accepting a defect class means
+   * accepting one design decision once.
+   */
+  groupId?: string;
   rule: string;
   selector: string;
   label: string;
   acceptedAt: string;
+  /** How many elements the class covered when it was accepted. */
+  instances?: number;
   note?: string;
 }
 
@@ -57,21 +70,32 @@ export interface BaselineApplication {
  * in a project that was not built with this from day one.
  */
 export function applyBaseline(findings: Finding[], baseline: BaselineFile): BaselineApplication {
-  const accepted = new Set(baseline.entries.map((e) => e.id));
-  const seen = new Set(findings.map((f) => f.id));
+  const acceptedGroups = new Set(
+    baseline.entries.map((e) => e.groupId).filter((g): g is string => Boolean(g)),
+  );
+  // Entries written before defect classes existed still match by element id.
+  const acceptedIds = new Set(baseline.entries.map((e) => e.id));
+
+  const seenGroups = new Set(findings.map((f) => f.groupId));
+  const seenIds = new Set(findings.map((f) => f.id));
 
   const active: Finding[] = [];
   const suppressed: Finding[] = [];
 
   for (const f of findings) {
-    if (accepted.has(f.id)) suppressed.push({ ...f, baselined: true });
-    else active.push(f);
+    if (acceptedGroups.has(f.groupId) || acceptedIds.has(f.id)) {
+      suppressed.push({ ...f, baselined: true });
+    } else {
+      active.push(f);
+    }
   }
 
   return {
     active,
     suppressed,
-    stale: baseline.entries.filter((e) => !seen.has(e.id)),
+    stale: baseline.entries.filter((e) =>
+      e.groupId ? !seenGroups.has(e.groupId) : !seenIds.has(e.id),
+    ),
   };
 }
 
@@ -81,24 +105,41 @@ export function acceptIntoBaseline(
   findings: Finding[],
   note?: string,
 ): BaselineFile {
-  const byId = new Map(existing.entries.map((e) => [e.id, e]));
+  const byGroup = new Map(
+    existing.entries.filter((e) => e.groupId).map((e) => [e.groupId!, e]),
+  );
   const acceptedAt = new Date().toISOString();
 
+  // One entry per defect class, not per element: 240 instances of one colour
+  // decision should be one line in the file, and stay accepted when the page
+  // regenerates with different ids.
+  const perGroup = new Map<string, Finding[]>();
   for (const f of findings) {
-    if (byId.has(f.id)) continue;
-    byId.set(f.id, {
-      id: f.id,
-      rule: f.rule,
-      selector: f.selector,
-      label: f.label,
+    const list = perGroup.get(f.groupId) ?? [];
+    list.push(f);
+    perGroup.set(f.groupId, list);
+  }
+
+  for (const [groupId, instances] of perGroup) {
+    if (byGroup.has(groupId)) continue;
+    const first = instances[0]!;
+    byGroup.set(groupId, {
+      id: first.id,
+      groupId,
+      rule: first.rule,
+      selector: first.selector,
+      label: first.label,
       acceptedAt,
+      instances: instances.length,
       note,
     });
   }
 
   return {
     version: 1,
-    entries: [...byId.values()].sort((a, b) => a.rule.localeCompare(b.rule) || a.id.localeCompare(b.id)),
+    entries: [...byGroup.values()].sort(
+      (a, b) => a.rule.localeCompare(b.rule) || a.id.localeCompare(b.id),
+    ),
   };
 }
 

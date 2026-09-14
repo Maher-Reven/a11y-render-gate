@@ -1,7 +1,7 @@
 import type { Page } from "playwright";
 import { IDX_ATTR } from "../core/collect.js";
 import { describeElement, sourceHint } from "../core/describe.js";
-import { makeFindingId, type Finding } from "../core/findings.js";
+import { makeFindingId, type ProbeFinding as Finding } from "../core/findings.js";
 import type { CollectResult, ElementSnapshot } from "../core/types.js";
 
 export interface KeyboardReachOptions {

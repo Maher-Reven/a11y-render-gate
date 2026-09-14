@@ -1,7 +1,7 @@
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
 import type { Page } from "playwright";
-import { makeFindingId, type Finding, type Severity } from "../core/findings.js";
+import { makeFindingId, type ProbeFinding as Finding, type Severity } from "../core/findings.js";
 
 const require = createRequire(import.meta.url);
 

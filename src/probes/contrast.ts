@@ -14,7 +14,7 @@ import {
   type Rgba,
 } from "../core/color.js";
 import { describeElement, sourceHint } from "../core/describe.js";
-import { makeFindingId, type Finding, type Severity } from "../core/findings.js";
+import { makeFindingId, type ProbeFinding as Finding, type Severity } from "../core/findings.js";
 import type { CollectResult, ElementSnapshot } from "../core/types.js";
 
 export interface ContrastOptions {

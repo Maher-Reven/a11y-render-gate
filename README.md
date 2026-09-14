@@ -237,6 +237,11 @@ Only **new** findings fail from now on. Without this step the gate blocks
 everything on day one and gets disabled permanently, which is the most common way
 tools like this die.
 
+The baseline records **problems, not elements**. One grey that fails contrast on
+240 elements is one entry, and it keeps matching when the page regenerates with
+different ids — which is what makes a baseline survive on a real site rather than
+going stale on the next deploy.
+
 ---
 
 ## The Stop hook
@@ -285,7 +290,7 @@ must produce **zero** findings.
 
 Working and covered by tests: the CLI, the MCP server, the blocking Stop hook,
 the Claude Code plugin, all seven rules, and all four sources — `url`, `html`,
-`storybook` and `component`. 72 tests pass, fixture-driven.
+`storybook` and `component`. 80 tests pass, fixture-driven.
 
 Validated against real pages, not only fixtures: a 3,000-element Wikipedia
 article and a production homepage. That exercise removed three false-positive

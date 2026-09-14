@@ -1,4 +1,5 @@
 import {
+  distinctProblems,
   groupFindings,
   severityRank,
   type Finding,
@@ -101,9 +102,18 @@ export function formatReport(input: FormatInput, options: FormatOptions = {}): s
     return lines.join("\n");
   }
 
+  // Count distinct problems, not instances. One grey that fails contrast on 240
+  // elements is one decision to make, and a headline of "240 findings" reads as
+  // a catastrophe rather than as a one-line fix.
+  const problems = distinctProblems(visible);
+  const scale =
+    problems > 0 && visible.length > problems
+      ? `${problems} problem${problems === 1 ? "" : "s"} across ${visible.length} elements`
+      : `${problems} problem${problems === 1 ? "" : "s"}`;
+
   lines.push(
     `${c(ANSI.red + ANSI.bold, "a11y-render-gate FAIL")}  ${input.source}`,
-    c(ANSI.dim, `${input.context} · ${input.elementsScanned} elements · ${fmtMs(input.durationMs)}`),
+    c(ANSI.dim, `${scale} · ${input.context} · ${input.elementsScanned} elements · ${fmtMs(input.durationMs)}`),
   );
 
   if (delta && (delta.fixed > 0 || delta.introduced > 0)) {
